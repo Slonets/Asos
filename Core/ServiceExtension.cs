@@ -15,6 +15,7 @@ namespace Core
         {            
             service.AddScoped<IJwtTokenService, JwtTokenService>();       
             service.AddScoped<IAccountService, AccountService>();       
+            service.AddScoped<ISmtpEmailService, SmtpEmailService>();
         }       
         public static void AddAutoMapper(this IServiceCollection service)
         {
