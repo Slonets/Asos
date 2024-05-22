@@ -19,15 +19,18 @@ namespace Core.Services
         private readonly UserManager<UserEntity> _userManager;        
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly ISmtpEmailService _emailService;
 
         public AccountService(UserManager<UserEntity> userManager,            
             IMapper mapper,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            ISmtpEmailService emailService)
         {
             
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         public async Task<string> Login(LoginDto model)
@@ -70,6 +73,18 @@ namespace Core.Services
                 var errors = string.Join(", ", resultCreated.Errors.Select(e => e.Description));
                 throw new CustomHttpException($"Не вдалося створити користувача: {errors}", HttpStatusCode.BadRequest);
             }
+            
+            if(resultCreated.Succeeded)
+            {
+                try
+                {
+                    _emailService.SuccessfulLogin(dto.FirstName + " " + dto.LastName, dto.Email);
+                }
+                catch (Exception ex)
+                {
+                    string error = ex.Message;
+                }
+            }
 
             // Асинхронне додавання створеного користувача до певної ролі
             var resultRole = await _userManager.AddToRoleAsync(user, Roles.User);
@@ -80,7 +95,7 @@ namespace Core.Services
                 // Логування помилок додавання до ролі
                 var errors = string.Join(", ", resultRole.Errors.Select(e => e.Description));
                 throw new CustomHttpException($"Не вдалося додати роль користувачу: {errors}", HttpStatusCode.BadRequest);
-            }
+            }           
 
             // Перевірка, чи dto містить зображення
             if (dto.Image != null)
