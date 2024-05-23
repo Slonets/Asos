@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces;
 using Core.Services;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,6 @@ namespace Core
         public static void AddAutoMapper(this IServiceCollection service)
         {
             service.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-        }
+        }       
     }
 }

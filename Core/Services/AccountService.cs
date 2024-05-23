@@ -53,13 +53,7 @@ namespace Core.Services
         }
 
         public async Task Registration(RegisterDto dto)
-        {
-            // Перевірка, чи паролі збігаються
-            if (dto.Password != dto.ConfirmPassword)
-            {
-                throw new CustomHttpException("Паролі не збігаються", HttpStatusCode.BadRequest);
-            }
-
+        {            
             // Маппінг об'єкта dto на об'єкт UserEntity за допомогою _mapper
             UserEntity user = _mapper.Map<UserEntity>(dto);
 
@@ -82,7 +76,7 @@ namespace Core.Services
                 }
                 catch (Exception ex)
                 {
-                    string error = ex.Message;
+                    throw new CustomHttpException("Лист на пошту відправити не вдалося", HttpStatusCode.BadRequest);
                 }
             }
 
