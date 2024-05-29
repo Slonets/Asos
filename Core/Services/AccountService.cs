@@ -1,37 +1,136 @@
 ﻿using AutoMapper;
 using Core.Constants;
 using Core.DTO.Authentication;
+using Core.Exceptions;
 using Core.Helpers;
 using Core.Interfaces;
+using Infrastructure.Data;
 using Infrastructure.Entities;
+using MailKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.Net;
-using Image = SixLabors.ImageSharp.Image;
+using static Google.Apis.Auth.GoogleJsonWebSignature;
+
 
 namespace Core.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly UserManager<UserEntity> _userManager;        
+        private readonly UserManager<UserEntity> _userManager;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ISmtpEmailService _emailService;
+        private readonly AsosDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AccountService(UserManager<UserEntity> userManager,            
+        public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
             IJwtTokenService jwtTokenService,
-            ISmtpEmailService emailService)
+            ISmtpEmailService emailService,
+            AsosDbContext context,
+            IConfiguration configuration)
         {
-            
+
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _mapper = mapper;
             _emailService = emailService;
+            _context = context;
+            _configuration = configuration;
         }
+    
+         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
+         {
+            Payload payload = await GetPayloadAsync(model.Credential);
+
+              UserEntity? user = await _userManager.FindByEmailAsync(payload.Email);
+
+              user ??= await CreateGoogleUserAsync(payload);
+
+           return user;
+         }
+
+        private async Task<Payload> GetPayloadAsync(string credential)
+        {
+            return await ValidateAsync(
+                credential,
+                new ValidationSettings
+                {
+                    Audience = [_configuration["Authentication:Google:ClientId"]]
+                }
+            );
+        }
+        private async Task<UserEntity> CreateGoogleUserAsync(Payload payload)
+        {
+            using var httpClient = new HttpClient();
+
+            var user = new UserEntity
+            {
+                FirstName = payload.GivenName,
+                LastName = payload.FamilyName,
+                Email = payload.Email,
+                //UserName = payload.Email,
+                
+            };
+
+
+            try
+            {
+                await CreateUserAsync(user);
+            }
+            catch
+            {
+               
+                throw;
+            }
+
+
+
+            return user;
+        }
+
+
+        private async Task CreateUserAsync(UserEntity user, string? password = null)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                IdentityResult identityResult = await CreateUserInDatabaseAsync(user, password);
+                if (!identityResult.Succeeded)
+                    throw new IdentityException(identityResult, "User creating error");
+
+                identityResult = await _userManager.AddToRoleAsync(user, Roles.User);
+                if (!identityResult.Succeeded)
+                    throw new IdentityException(identityResult, "Role assignment error");
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        private async Task<IdentityResult> CreateUserInDatabaseAsync(UserEntity user, string? password)
+        {
+            if (password is null)
+                return await _userManager.CreateAsync(user);
+
+            return await _userManager.CreateAsync(user, password);
+        }
+
+
+
+
+
+
 
         public async Task<string> Login(LoginDto model)
         {
