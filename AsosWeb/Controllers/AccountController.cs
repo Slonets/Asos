@@ -64,7 +64,7 @@ namespace AsosWeb.Controllers
 
         
         }
-        [HttpPost("loginByGoogle")]
+        [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
         {
             try

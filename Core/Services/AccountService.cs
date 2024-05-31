@@ -74,7 +74,7 @@ namespace Core.Services
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName,
                 Email = payload.Email,
-                //UserName = payload.Email,
+                UserName = payload.Email,
                 
             };
 
