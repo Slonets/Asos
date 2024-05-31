@@ -6,12 +6,18 @@ using Core.Services;
 using Core.Validator;
 using FluentValidation;
 using Infrastructure.Entities;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Core.Exceptions;
+using Google.Apis.Auth;
+
 
 namespace AsosWeb.Controllers
 {
@@ -21,12 +27,16 @@ namespace AsosWeb.Controllers
     {
 
         private readonly IAccountService _accountService;        
-        private readonly IMapper _mapper;       
+        private readonly IMapper _mapper;    
+        private readonly IJwtTokenService _jwtTokenService;
+        UserManager<UserEntity> userManager;
 
-        public AccountController(IAccountService accountService, IMapper mapper)
+        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService)
         {
             _accountService = accountService;
-            _mapper = mapper;            
+            _mapper = mapper;
+            _jwtTokenService = jwtTokenService;
+            
         }
 
         [AllowAnonymous]
@@ -66,6 +76,27 @@ namespace AsosWeb.Controllers
             {
                 return BadRequest(validationResult.Errors);
             }         
+        }
+        [HttpPost("GoogleSignIn")]
+        public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
+        {
+            try
+            {
+                UserEntity user = await _accountService.GoogleSignInAsync(model);
+
+                return Ok(new JwtTokenResponseDto
+                {
+                    Token = await _jwtTokenService.CreateToken(user)
+                });
+            }
+            catch (InvalidJwtException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (IdentityException e)
+            {
+                return StatusCode(500, e.IdentityResult.Errors);
+            }
         }
     }
 }
