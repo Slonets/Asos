@@ -3,6 +3,8 @@ using Core.DTO.Authentication;
 using Core.Helpers;
 using Core.Interfaces;
 using Core.Services;
+using Core.Validator;
+using FluentValidation;
 using Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
@@ -41,29 +43,41 @@ namespace AsosWeb.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            var token = await _accountService.Login(model);
+            var validator = new LoginValidator();
 
-            return Ok(new { token });
+            var validationResult = validator.Validate(model);
+
+            if (validationResult.IsValid)
+            {
+                var token = await _accountService.Login(model);
+
+                return Ok(new { token });
+            }
+            else
+            {
+                return BadRequest(validationResult.Errors);
+            }          
         }
 
-        [AllowAnonymous]
+       
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
-            try
+            var validator = new RegisterValidator();
+
+            var validationResult = validator.Validate(model);
+
+            if (validationResult.IsValid)
             {
                 await _accountService.Registration(model);
                 return Ok();
-                
             }
-            catch (Exception ex)
+            else
             {
-
-                return BadRequest(ex.Message);
-            }           
-
-        
+                return BadRequest(validationResult.Errors);
+            }         
         }
+
         [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
         {
