@@ -59,7 +59,7 @@ namespace AsosWeb.Controllers
             }          
         }
 
-        [AllowAnonymous]
+       
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
@@ -77,6 +77,7 @@ namespace AsosWeb.Controllers
                 return BadRequest(validationResult.Errors);
             }         
         }
+
         [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
         {
