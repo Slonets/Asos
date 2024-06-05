@@ -6,6 +6,7 @@ using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
+using Infrastructure.Interfaces;
 using MailKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +23,7 @@ namespace Core.Services
     public class AccountService : IAccountService
     {
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IRepository<UserEntity> _userEntity;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ISmtpEmailService _emailService;
@@ -33,7 +35,8 @@ namespace Core.Services
             IJwtTokenService jwtTokenService,
             ISmtpEmailService emailService,
             AsosDbContext context,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IRepository<UserEntity> userEntity)
         {
 
             _userManager = userManager;
@@ -42,6 +45,7 @@ namespace Core.Services
             _emailService = emailService;
             _context = context;
             _configuration = configuration;
+            _userEntity= userEntity;
         }
     
          public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
@@ -262,6 +266,38 @@ namespace Core.Services
                     throw new CustomHttpException($"Фото не додалося: {ex.Message}", HttpStatusCode.NotFound);
                 }
             }
+        }
+
+        // Асинхронний метод для зміни даних користувача
+        public async Task UpdateUserDataAsync(RegisterDto user, string newFirstName, string newLastName, string newPhoneNumber, string newEmail)
+        {            
+            // Синхронні операції зміни даних
+            user.FirstName = newFirstName;
+            user.LastName = newLastName;
+            user.PhoneNumber = newPhoneNumber;
+            user.Email = newEmail;
+
+            await _userEntity.UpdateAsync(_mapper.Map<UserEntity>(user));            
+        }
+
+        // Асинхронний метод для зміни пароля користувача
+        public async Task ChangePasswordAsync(RegisterDto user, string currentPassword, string newPassword, string confirmNewPassword)
+        {
+            if (user.Password != currentPassword)
+            {
+                throw new CustomHttpException($"Паролі не співпадають", HttpStatusCode.NotFound);                              
+            }
+
+            if (newPassword != confirmNewPassword)
+            {
+                throw new CustomHttpException($"Підтвердження і новий пароль не співпадають", HttpStatusCode.NotFound);                
+            }
+
+            // Синхронні операції зміни пароля
+            user.Password = newPassword;
+            user.ConfirmPassword = confirmNewPassword;
+
+            await _userEntity.UpdateAsync(_mapper.Map<UserEntity>(user));
         }
 
     }

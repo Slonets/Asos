@@ -99,5 +99,25 @@ namespace AsosWeb.Controllers
                 return StatusCode(500, e.IdentityResult.Errors);
             }
         }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUserData([FromBody] RegisterDto user, [FromQuery] string newFirstName, [FromQuery] string newLastName, [FromQuery] string newPhoneNumber, [FromQuery] string newEmail)
+        {
+            await _accountService.UpdateUserDataAsync(user, newFirstName, newLastName, newPhoneNumber, newEmail);
+            return Ok(new { message = "User data updated successfully" });
+        }
+
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] RegisterDto user, [FromQuery] string currentPassword, [FromQuery] string newPassword, [FromQuery] string confirmNewPassword)
+        {
+            var result = await _accountService.ChangePasswordAsync(user, currentPassword, newPassword, confirmNewPassword);
+            
+            if (!result)
+            {
+                return BadRequest(new { message = "Змінити пароль не вдалося" });
+            }
+
+            return Ok(new { message = "Пароль успішно змінено" });
+        }
     }
 }
