@@ -22,7 +22,6 @@ namespace Core
         public static void AddAutoMapper(this IServiceCollection service)
         {
             service.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            service.AddAutoMapper(typeof(ProductProfile));
         }
     }
 }
