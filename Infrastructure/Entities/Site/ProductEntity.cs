@@ -28,6 +28,7 @@ namespace Infrastructure.Entities.Site
         public string LookAfterMe { get; set; }
         public string AboutMe { get; set; }
         public string SizeAndFit { get; set; }
+        public int Amount {  get; set; }
         public ICollection<ProductImageEntity> productImages { get; set; }
 
     }
