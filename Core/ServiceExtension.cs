@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces;
+using Core.Mapper;
 using Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,10 +17,12 @@ namespace Core
             service.AddScoped<IJwtTokenService, JwtTokenService>();       
             service.AddScoped<IAccountService, AccountService>();       
             service.AddScoped<ISmtpEmailService, SmtpEmailService>();
+            service.AddScoped<IProductService, ProductService>();
         }       
         public static void AddAutoMapper(this IServiceCollection service)
         {
             service.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            service.AddAutoMapper(typeof(ProductProfile));
         }
     }
 }
