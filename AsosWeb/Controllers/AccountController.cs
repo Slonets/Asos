@@ -17,6 +17,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Core.Exceptions;
 using Google.Apis.Auth;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AsosWeb.Controllers
@@ -61,7 +62,7 @@ namespace AsosWeb.Controllers
 
        
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterDto model)
+        public async Task<IActionResult> Register(RegisterDto model)
         {
             var validator = new RegisterValidator();
 
@@ -100,24 +101,34 @@ namespace AsosWeb.Controllers
             }
         }
 
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateUserData([FromBody] RegisterDto user, [FromQuery] string newFirstName, [FromQuery] string newLastName, [FromQuery] string newPhoneNumber, [FromQuery] string newEmail)
+        [HttpPut("edit-user")]
+        public async Task<IActionResult> EditUser(EditUserDto editUserDto)
         {
-            await _accountService.UpdateUserDataAsync(user, newFirstName, newLastName, newPhoneNumber, newEmail);
-            return Ok(new { message = "User data updated successfully" });
+
+             await _accountService.EditUserAsync(editUserDto);           
+
+            return Ok(new { message = "Дані користувача"+ " "+ editUserDto.FirstName + " " + editUserDto.LastName+" "+ "було оновлено" });
         }
 
-        [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] RegisterDto user, [FromQuery] string currentPassword, [FromQuery] string newPassword, [FromQuery] string confirmNewPassword)
-        {
-            var result = await _accountService.ChangePasswordAsync(user, currentPassword, newPassword, confirmNewPassword);
+        //[HttpPut("change-password")]
+        //public async Task<IActionResult> ChangePassword([FromBody] RegisterDto user, [FromQuery] string currentPassword, [FromQuery] string newPassword, [FromQuery] string confirmNewPassword)
+        //{
+        //    var result = _accountService.ChangePasswordAsync(user, currentPassword, newPassword, confirmNewPassword);
             
-            if (!result)
-            {
-                return BadRequest(new { message = "Змінити пароль не вдалося" });
-            }
+        //    if (result==null)
+        //    {
+        //        return BadRequest(new { message = "Змінити пароль не вдалося" });
+        //    }
 
-            return Ok(new { message = "Пароль успішно змінено" });
+        //    return Ok(new { message = "Пароль успішно змінено" });
+        //}
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById([FromRoute] int id)
+        {
+            var user = await _accountService.GetUserById(id);
+            
+            return Ok(user);
         }
     }
 }
