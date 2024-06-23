@@ -1,5 +1,7 @@
 ﻿using Core.DTO.Authentication;
 using Infrastructure.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +15,8 @@ namespace Core.Interfaces
         Task<string> Login(LoginDto loginDto);
         Task Registration(RegisterDto dto);       
         Task<UserEntity> GoogleSignInAsync(GoogleSignInDto loginDto);
+        Task EditUserAsync(EditUserDto editUserDto);
+        Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser);
+        Task<UserEntity> GetUserById(int id);        
     }
 }

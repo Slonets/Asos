@@ -6,6 +6,7 @@ using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
+using Infrastructure.Interfaces;
 using MailKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -22,18 +23,23 @@ namespace Core.Services
     public class AccountService : IAccountService
     {
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IRepository<UserEntity> _userEntity;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ISmtpEmailService _emailService;
         private readonly AsosDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IFotoAvatar _fotoAvatar;
 
         public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
             IJwtTokenService jwtTokenService,
             ISmtpEmailService emailService,
             AsosDbContext context,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IRepository<UserEntity> userEntity,
+            IFotoAvatar fotoAvatar
+            )
         {
 
             _userManager = userManager;
@@ -42,18 +48,20 @@ namespace Core.Services
             _emailService = emailService;
             _context = context;
             _configuration = configuration;
+            _userEntity = userEntity;
+            _fotoAvatar = fotoAvatar;
         }
-    
-         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
-         {
+
+        public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
+        {
             Payload payload = await GetPayloadAsync(model.Credential);
 
-              UserEntity? user = await _userManager.FindByEmailAsync(payload.Email);
+            UserEntity? user = await _userManager.FindByEmailAsync(payload.Email);
 
-              user ??= await CreateGoogleUserAsync(payload);
+            user ??= await CreateGoogleUserAsync(payload);
 
-           return user;
-         }
+            return user;
+        }
 
         private async Task<Payload> GetPayloadAsync(string credential)
         {
@@ -75,7 +83,7 @@ namespace Core.Services
                 LastName = payload.FamilyName,
                 Email = payload.Email,
                 UserName = payload.Email,
-                
+
             };
 
 
@@ -85,7 +93,7 @@ namespace Core.Services
             }
             catch
             {
-               
+
                 throw;
             }
 
@@ -93,7 +101,6 @@ namespace Core.Services
 
             return user;
         }
-
 
         private async Task CreateUserAsync(UserEntity user, string? password = null)
         {
@@ -125,12 +132,10 @@ namespace Core.Services
 
             return await _userManager.CreateAsync(user, password);
         }
-
-
-
-
-
-
+        public bool IsEmailRegistered(string email)
+        {
+            return _context.Users.Any(user => user.Email == email);
+        }
 
         public async Task<string> Login(LoginDto model)
         {
@@ -152,31 +157,43 @@ namespace Core.Services
         }
 
         public async Task Registration(RegisterDto dto)
-        {            
+        {
             // Маппінг об'єкта dto на об'єкт UserEntity за допомогою _mapper
             UserEntity user = _mapper.Map<UserEntity>(dto);
 
-            // Асинхронне створення нового користувача з паролем
-            var resultCreated = await _userManager.CreateAsync(user, dto.Password);
+            // Перевірка, чи такий email вже зареєстрований
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
 
-            // Перевірка результату створення користувача
-            if (!resultCreated.Succeeded)
+
+            if (existingUser == null)
             {
-                // Логування помилок створення користувача
-                var errors = string.Join(", ", resultCreated.Errors.Select(e => e.Description));
-                throw new CustomHttpException($"Не вдалося створити користувача: {errors}", HttpStatusCode.BadRequest);
+                // Асинхронне створення нового користувача з паролем
+                var resultCreated = await _userManager.CreateAsync(user, dto.Password);
+
+
+                // Перевірка результату створення користувача
+                if (!resultCreated.Succeeded)
+                {
+                    // Логування помилок створення користувача
+                    var errors = string.Join(", ", resultCreated.Errors.Select(e => e.Description));
+                    throw new CustomHttpException($"Не вдалося створити користувача: {errors}", HttpStatusCode.BadRequest);
+                }
+
+                if (resultCreated.Succeeded)
+                {
+                    try
+                    {
+                        _emailService.SuccessfulLogin(dto.FirstName + " " + dto.LastName, dto.Email);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new CustomHttpException("Лист на пошту відправити не вдалося", HttpStatusCode.BadRequest);
+                    }
+                }
             }
-            
-            if(resultCreated.Succeeded)
+            else
             {
-                try
-                {
-                    _emailService.SuccessfulLogin(dto.FirstName + " " + dto.LastName, dto.Email);
-                }
-                catch (Exception ex)
-                {
-                    throw new CustomHttpException("Лист на пошту відправити не вдалося", HttpStatusCode.BadRequest);
-                }
+                throw new CustomHttpException("Така пошта уже зареєстрована", HttpStatusCode.BadRequest);
             }
 
             // Асинхронне додавання створеного користувача до певної ролі
@@ -188,81 +205,62 @@ namespace Core.Services
                 // Логування помилок додавання до ролі
                 var errors = string.Join(", ", resultRole.Errors.Select(e => e.Description));
                 throw new CustomHttpException($"Не вдалося додати роль користувачу: {errors}", HttpStatusCode.BadRequest);
-            }           
+            }
 
-            // Перевірка, чи dto містить зображення
-            if (dto.Image != null)
+
+        }
+
+        public async Task<UserEntity> GetUserById(int id)
+        {
+            var user = await _userEntity.GetByIDAsync(id);
+
+            if (user == null)
             {
-                // Визначення шляху до папки для збереження аватарок
-                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "images", "avatars");
-
-                // Перевірка, чи існує папка
-                if (!Directory.Exists(uploadFolderPath))
-                {
-                    // Створення папки, якщо вона не існує
-                    Directory.CreateDirectory(uploadFolderPath);
-                }
-
-                // Перевірка, чи поле Image у користувача не порожнє
-                if (!string.IsNullOrEmpty(user.Image))
-                {
-                    // Визначення шляху до старого файлу зображення
-                    var delFilePath = Path.Combine(uploadFolderPath, user.Image);
-
-                    // Перевірка, чи існує старий файл зображення
-                    if (File.Exists(delFilePath))
-                    {
-                        // Видалення старого файлу зображення
-                        File.Delete(delFilePath);
-                    }
-                }
-
-                try
-                {
-                    // Генерація унікального імені файлу
-                    string webFileName = Guid.NewGuid().ToString() + ".webp";
-
-                    var filePath = Path.Combine(uploadFolderPath, webFileName); // Визначення шляху до нового файлу зображення
-
-                    // Створення файлового потоку для запису файлу
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        // Асинхронне копіювання зображення до файлового потоку
-                        await dto.Image.CopyToAsync(stream);
-                    }
-
-                    // Завантаження зображення для обробки
-                    using (var image = Image.Load(filePath))
-                    {
-                        // Зміна розміру зображення
-                        image.Mutate(x => x.Resize(new ResizeOptions
-                        {
-                            Size = new Size(150, 150), // Встановлення розмірів зображення
-                            Mode = ResizeMode.Max // Встановлення режиму зміни розміру
-                        }));
-
-                        image.Save(filePath); // Збереження обробленого зображення
-                    }
-
-                    // Збереження імені нового файлу зображення в поле Image користувача
-                    user.Image = webFileName;
-
-                    // Асинхронне оновлення даних користувача
-                    var resultUpdate = await _userManager.UpdateAsync(user);
-
-                    // Перевірка результату оновлення користувача
-                    if (!resultUpdate.Succeeded)
-                    {
-                        var errors = string.Join(", ", resultUpdate.Errors.Select(e => e.Description));
-                        throw new CustomHttpException($"Не вдалося оновити користувача: {errors}", HttpStatusCode.BadRequest);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new CustomHttpException($"Фото не додалося: {ex.Message}", HttpStatusCode.NotFound);
-                }
+                throw new CustomHttpException($"Користувача не знайдено", HttpStatusCode.NotFound);
+            }
+            else
+            {
+                return user;
             }
         }
+
+        // Асинхронний метод для зміни даних користувача
+        public async Task EditUserAsync(EditUserDto editUserDto)
+        {
+            var user = await _userEntity.GetByIDAsync(editUserDto.Id);
+
+            if (user == null)
+            {
+                throw new CustomHttpException($"Користувача з Id = {editUserDto.Id} не знайдено", HttpStatusCode.NotFound);
+            }
+
+            // Синхронні операції зміни даних
+            user.FirstName = editUserDto.FirstName;
+            user.LastName = editUserDto.LastName;
+            user.PhoneNumber = editUserDto.PhoneNumber;
+            user.Email = editUserDto.Email;
+            
+
+            if (editUserDto.Image != null)
+            {
+                user.Image = editUserDto.Image;
+            }
+
+            await _userEntity.UpdateAsync(user);
+            await _userEntity.SaveAsync();
+        }
+
+
+        // Асинхронний метод для зміни пароля користувача
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser)
+        {
+            var user = _userEntity.GetByIDAsync(idUser).Result;            
+
+            var result = await _userManager.ChangePasswordAsync(user, model.currentPassword, model.newPassword);
+            
+            return result;
+        }
+
 
     }
 }

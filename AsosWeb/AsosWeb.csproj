@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\avatars\5292c654-9bdc-4cea-8c5a-a6b4e91125db.webp" />
+    <None Include="wwwroot\avatars\6dc36622-68e6-4cc0-97a6-a7818f4cf06f.webp" />
+    <None Include="wwwroot\avatars\user404.png" />
+  </ItemGroup>
+
 </Project>

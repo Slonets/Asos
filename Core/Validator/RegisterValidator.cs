@@ -1,18 +1,13 @@
 ﻿using Core.DTO.Authentication;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Validator
 {
     public class RegisterValidator : AbstractValidator<RegisterDto>
     {
-        public RegisterValidator() 
-        {
+       
+        public RegisterValidator()
+        {            
             RuleFor(reg => reg.Email)
             .NotNull().WithMessage("Email не може бути порожній") //гарантуємо, що не буде порожній
             .NotEmpty().WithMessage("Email не може містити пробілів") //якщо це рядок, то не має бути пробілів
@@ -49,6 +44,6 @@ namespace Core.Validator
             .MaximumLength(30).WithMessage("Телефон  не може бути більшим за 30 символи")
             .MinimumLength(5).WithMessage("Телефон не може мати менше 5 символів")
             .Matches(@"^\d+$").WithMessage("Номер телефону повинен містити тільки цифри");
-        }
+        }        
     }
 }
