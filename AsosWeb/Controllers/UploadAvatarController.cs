@@ -1,6 +1,5 @@
 ﻿using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AsosWeb.Controllers
@@ -10,10 +9,9 @@ namespace AsosWeb.Controllers
         public IFormFile Image { get; set; }
     }
 
-
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class UploadAvatarController : ControllerBase
     {
         private readonly IFotoAvatar _image;
@@ -28,10 +26,11 @@ namespace AsosWeb.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost("UpdateAvatar")]
         public async Task<IActionResult> UpdateAvatar([FromForm] UpdateImageModel model)
         {
-            string oldFoto = User.Claims.ToList()[5].ToString();
+            string oldFoto = User.Claims.ToList()[5].Value.ToString();
 
             var result = await _image.UpdateFoto(model.Image, oldFoto);
             return Ok(result);

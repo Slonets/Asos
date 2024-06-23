@@ -239,33 +239,15 @@ namespace Core.Services
             user.LastName = editUserDto.LastName;
             user.PhoneNumber = editUserDto.PhoneNumber;
             user.Email = editUserDto.Email;
-
-           
-                await _userEntity.UpdateAsync(user);
-                await _userEntity.SaveAsync();
             
 
-            //if (editUserDto.Image != null)
-            //{
+            if (editUserDto.Image != null)
+            {
+                user.Image = editUserDto.Image;
+            }
 
-
-
-            //    var resultUpdate = await _userManager.UpdateAsync(user);
-            //    await _userEntity.SaveAsync();
-
-            //    if (!resultUpdate.Succeeded)
-
-            //        try
-            //        {
-            //            var errors = string.Join(", ", resultUpdate.Errors.Select(e => e.Description));
-            //            throw new CustomHttpException($"Не вдалося оновити користувача: {errors}", HttpStatusCode.BadRequest);
-
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            throw new CustomHttpException($"Фото не оновилося: {ex.Message}", HttpStatusCode.NotFound);
-            //        }
-            //}
+            await _userEntity.UpdateAsync(user);
+            await _userEntity.SaveAsync();
         }
 
 

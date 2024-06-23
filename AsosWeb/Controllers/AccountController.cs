@@ -62,7 +62,7 @@ namespace AsosWeb.Controllers
 
        
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto model)
+        public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
             var validator = new RegisterValidator();
 
@@ -102,7 +102,7 @@ namespace AsosWeb.Controllers
         }
 
         [HttpPut("edit-user")]
-        public async Task<IActionResult> EditUser(EditUserDto editUserDto)
+        public async Task<IActionResult> EditUser([FromForm] EditUserDto editUserDto)
         {
 
              await _accountService.EditUserAsync(editUserDto);           
