@@ -252,24 +252,14 @@ namespace Core.Services
 
 
         // Асинхронний метод для зміни пароля користувача
-        //public async Task ChangePasswordAsync(RegisterDto user, string currentPassword, string newPassword, string confirmNewPassword)
-        //{
-        //    if (user.Password != currentPassword)
-        //    {
-        //        throw new CustomHttpException($"Паролі не співпадають", HttpStatusCode.NotFound);
-        //    }
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser)
+        {
+            var user = _userEntity.GetByIDAsync(idUser).Result;            
 
-        //    if (newPassword != confirmNewPassword)
-        //    {
-        //        throw new CustomHttpException($"Підтвердження і новий пароль не співпадають", HttpStatusCode.NotFound);
-        //    }
-
-        //    // Синхронні операції зміни пароля
-        //    user.Password = newPassword;
-        //    user.ConfirmPassword = confirmNewPassword;
-
-        //    await _userEntity.UpdateAsync(_mapper.Map<UserEntity>(user));
-        //}
+            var result = await _userManager.ChangePasswordAsync(user, model.currentPassword, model.newPassword);
+            
+            return result;
+        }
 
 
     }

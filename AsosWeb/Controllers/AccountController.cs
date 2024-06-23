@@ -110,25 +110,25 @@ namespace AsosWeb.Controllers
             return Ok(new { message = "Дані користувача"+ " "+ editUserDto.FirstName + " " + editUserDto.LastName+" "+ "було оновлено" });
         }
 
-        //[HttpPut("change-password")]
-        //public async Task<IActionResult> ChangePassword([FromBody] RegisterDto user, [FromQuery] string currentPassword, [FromQuery] string newPassword, [FromQuery] string confirmNewPassword)
-        //{
-        //    var result = _accountService.ChangePasswordAsync(user, currentPassword, newPassword, confirmNewPassword);
-            
-        //    if (result==null)
-        //    {
-        //        return BadRequest(new { message = "Змінити пароль не вдалося" });
-        //    }
-
-        //    return Ok(new { message = "Пароль успішно змінено" });
-        //}
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById([FromRoute] int id)
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDto model)
         {
-            var user = await _accountService.GetUserById(id);
-            
-            return Ok(user);
-        }
+            string number = User.Claims.ToList()[0].Value.ToString();
+
+            int idUser = int.Parse(number);
+
+            var result = _accountService.ChangePasswordAsync(model, idUser);
+
+            if (result.Result.Succeeded)
+            {
+                return Ok(new { message = "Пароль успішно змінено" });
+            }
+            else
+            { 
+            return BadRequest(new { message = "Змінити пароль не вдалося", result });
+            }
+
+        }        
     }
 }
