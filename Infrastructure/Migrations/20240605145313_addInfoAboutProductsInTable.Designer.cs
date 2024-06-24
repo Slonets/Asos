@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AsosDbContext))]
-    partial class AsosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240605145313_addInfoAboutProductsInTable")]
+    partial class addInfoAboutProductsInTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,9 +98,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("AboutMe")
                         .HasColumnType("text");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
 
                     b.Property<int>("BrandId")
                         .HasColumnType("integer");

@@ -1,5 +1,6 @@
 using AsosWeb;
 using Core;
+using Core.Helpers;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Entities;
@@ -24,6 +25,8 @@ builder.Services.AddControllers();
 //додаЇмо –епозитор≥й
 builder.Services.AddRepository();
 
+    
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
@@ -35,6 +38,7 @@ builder.Services.AddSwaggerGen(options => {
             Type = SecuritySchemeType.Http,
             Scheme = "bearer"
         }
+        
     );
     options.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
@@ -47,6 +51,7 @@ builder.Services.AddSwaggerGen(options => {
             new List<string>()
         }
     });
+    options.SchemaFilter<EnumSchemaFilter>();
 });
 
 builder.Services.AddAutoMapper();
@@ -134,6 +139,8 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.SeedData();
 
