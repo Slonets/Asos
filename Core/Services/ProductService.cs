@@ -5,6 +5,7 @@ using Infrastructure.Data;
 using Infrastructure.Entities.Site;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -71,5 +72,29 @@ namespace Core.Services
 
             }
         }
+
+        public async Task Delete(int id)
+        {
+           var currentPost = await Get(id);
+
+            if (currentPost != null) 
+            {
+                return;
+            }
+            ////
+        }
+
+        public async Task<CreateProductDto> Get(int id)
+        {
+            if (id < 0) return null; // exception handling
+
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null) return null; // exception handling
+
+            return _mapper.Map<CreateProductDto>(product);
+        }
+
+        
     }
 }

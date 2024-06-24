@@ -10,5 +10,7 @@ namespace Core.Interfaces
     public interface IProductService
     {
         Task Create(CreateProductDto model);
+        Task Delete(int id);
+        Task<CreateProductDto> Get(int id);
     }
 }
