@@ -3,6 +3,8 @@ using Core.DTO.Authentication;
 using Core.Helpers;
 using Core.Interfaces;
 using Core.Services;
+using Core.Validator;
+using FluentValidation;
 using Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
@@ -15,6 +17,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Core.Exceptions;
 using Google.Apis.Auth;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AsosWeb.Controllers
@@ -41,29 +44,41 @@ namespace AsosWeb.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            var token = await _accountService.Login(model);
+            var validator = new LoginValidator();
 
-            return Ok(new { token });
+            var validationResult = validator.Validate(model);
+
+            if (validationResult.IsValid)
+            {
+                var token = await _accountService.Login(model);
+
+                return Ok(new { token });
+            }
+            else
+            {
+                return BadRequest(validationResult.Errors);
+            }          
         }
 
-        [AllowAnonymous]
+       
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
-            try
+            var validator = new RegisterValidator();
+
+            var validationResult = validator.Validate(model);
+
+            if (validationResult.IsValid)
             {
                 await _accountService.Registration(model);
                 return Ok();
-                
             }
-            catch (Exception ex)
+            else
             {
-
-                return BadRequest(ex.Message);
-            }           
-
-        
+                return BadRequest(validationResult.Errors);
+            }         
         }
+
         [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
         {
@@ -85,5 +100,35 @@ namespace AsosWeb.Controllers
                 return StatusCode(500, e.IdentityResult.Errors);
             }
         }
+
+        [HttpPut("edit-user")]
+        public async Task<IActionResult> EditUser([FromForm] EditUserDto editUserDto)
+        {
+
+             await _accountService.EditUserAsync(editUserDto);           
+
+            return Ok(new { message = "Дані користувача"+ " "+ editUserDto.FirstName + " " + editUserDto.LastName+" "+ "було оновлено" });
+        }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDto model)
+        {
+            string number = User.Claims.ToList()[0].Value.ToString();
+
+            int idUser = int.Parse(number);
+
+            var result = _accountService.ChangePasswordAsync(model, idUser);
+
+            if (result.Result.Succeeded)
+            {
+                return Ok(new { message = "Пароль успішно змінено" });
+            }
+            else
+            { 
+            return BadRequest(new { message = "Змінити пароль не вдалося", result });
+            }
+
+        }        
     }
 }
