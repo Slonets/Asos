@@ -20,6 +20,7 @@ namespace Core
             service.AddScoped<ISmtpEmailService, SmtpEmailService>();
             service.AddScoped<IFotoAvatar, FotoAvatar>();
             service.AddScoped<IProductService, ProductService>();
+            service.AddScoped<ICategoryService, CategoryService>();
         }       
         public static void AddAutoMapper(this IServiceCollection service)
         {

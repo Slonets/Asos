@@ -1,5 +1,6 @@
 ﻿using Core.DTO.Site.Product;
 using Core.Interfaces;
+using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AsosWeb.Controllers
@@ -9,9 +10,11 @@ namespace AsosWeb.Controllers
     public class DashboardController : Controller
     {
         private readonly IProductService _productService;
-        public DashboardController(IProductService productService)
+        private readonly ICategoryService _categoryService;
+        public DashboardController(IProductService productService, ICategoryService categoryService)
         {
             _productService = productService;
+            _categoryService = categoryService;
         }
 
         [HttpPost("CreateProduct")]
@@ -19,6 +22,11 @@ namespace AsosWeb.Controllers
         {
             await _productService.Create(model);
             return Ok(model);
+        }
+        [HttpGet("GetAllCategory")]
+        public async Task<IActionResult> Index()
+        {
+            return Ok(await _categoryService.GettAll());
         }
     }
 }
