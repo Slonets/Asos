@@ -11,10 +11,12 @@ namespace AsosWeb.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
-        public DashboardController(IProductService productService, ICategoryService categoryService)
+        private readonly IBrandService _brandService;
+        public DashboardController(IProductService productService, ICategoryService categoryService, IBrandService brandService)
         {
             _productService = productService;
             _categoryService = categoryService;
+            _brandService = brandService;
         }
 
         [HttpPost("CreateProduct")]
@@ -24,9 +26,14 @@ namespace AsosWeb.Controllers
             return Ok(model);
         }
         [HttpGet("GetAllCategory")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetAllCategory()
         {
             return Ok(await _categoryService.GettAll());
+        }
+        [HttpGet("GetAllBrand")]
+        public async Task<IActionResult> GetAllBrand()
+        {
+            return Ok(await _brandService.GettAll());
         }
     }
 }
