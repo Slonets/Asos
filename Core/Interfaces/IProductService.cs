@@ -1,4 +1,6 @@
-﻿using Core.DTO.Site.Product;
+﻿using Core.DTO.Site.Category;
+using Core.DTO.Site.Product;
+using Infrastructure.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,9 @@ namespace Core.Interfaces
         Task Create(CreateProductDto model);
         Task Delete(int id);
         Task<CreateProductDto> Get(int id);
+        List<object> GettAllSizes();
+        List<object> GettAllGenders();
+        Task<List<object>> GettAllSizesAsync();
+        Task<List<object>> GettAllGendersAsync();
     }
 }
