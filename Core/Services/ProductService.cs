@@ -2,6 +2,7 @@
 using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Entities.Enums;
 using Infrastructure.Entities.Site;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -61,7 +62,9 @@ namespace Core.Services
 
                     var img = new ProductImageEntity
                     {
-                        ImagePath = fileName + extensions
+                        ImagePath = fileName + extensions,
+                        ProductId = product.Id,
+                        
                     };
 
                     imgList.Add(img);
@@ -72,6 +75,13 @@ namespace Core.Services
 
             }
         }
+
+
+
+
+       
+
+
 
         public async Task Delete(int id)
         {
@@ -95,6 +105,45 @@ namespace Core.Services
             return _mapper.Map<CreateProductDto>(product);
         }
 
-        
+        public List<object> GettAllGenders()
+        {
+            var genders = Enum.GetValues(typeof(Gender))
+                             .Cast<Gender>()
+                             .Select(s => new
+                             {
+                                 label = s.ToString(),
+                                 value = (int)s
+                             })
+                             .ToList<object>();
+
+            return genders;
+        }
+
+        public async Task<List<object>> GettAllGendersAsync()
+        {
+            return await Task.FromResult(GettAllGenders());
+        }
+
+     
+        public List<object> GettAllSizes()
+        {
+            var sizeOptions = Enum.GetValues(typeof(Size))
+                              .Cast<Size>()
+                              .Select(s => new
+                              {
+                                  label = s.ToString(),
+                                  value = (int)s
+                              })
+                              .ToList<object>();
+
+            return sizeOptions;
+        }
+
+        public async Task<List<object>> GettAllSizesAsync()
+        {
+            return await Task.FromResult(GettAllSizes());
+        }
+
+       
     }
 }
