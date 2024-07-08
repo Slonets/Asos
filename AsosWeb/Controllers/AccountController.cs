@@ -129,6 +129,25 @@ namespace AsosWeb.Controllers
             return BadRequest(new { message = "Змінити пароль не вдалося", result });
             }
 
-        }        
+        }
+
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            return Ok(await _accountService.GetAllUsers());
+        }
+
+        [HttpPost("BlockUser")]
+        public async Task<IActionResult> BlockUser([FromBody] BlockUserDto model)
+        {
+            return Ok(await _accountService.BlockUser(model.UserId));
+        }
+
+
+        [HttpPost("UnBlockUser")]
+        public async Task<IActionResult> UnBlockUser(int userId)
+        {
+            return Ok(await _accountService.UnblockUser(userId));
+        }
     }
 }

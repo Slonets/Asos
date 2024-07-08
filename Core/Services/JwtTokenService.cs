@@ -33,7 +33,7 @@ namespace Core.Services
                 new Claim("firstName", user.FirstName),
                 new Claim("lastName", user.LastName),
                 new Claim("email", user.Email),
-                new Claim("phoneNumber", user.PhoneNumber),                
+                new Claim("phoneNumber", user.PhoneNumber??string.Empty),                
                 new Claim("image", user.Image ?? string.Empty)
             };
 

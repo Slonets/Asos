@@ -17,6 +17,9 @@ namespace Core.Interfaces
         Task<UserEntity> GoogleSignInAsync(GoogleSignInDto loginDto);
         Task EditUserAsync(EditUserDto editUserDto);
         Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser);
-        Task<UserEntity> GetUserById(int id);        
+        Task<UserEntity> GetUserById(int id);
+        Task<IdentityResult> BlockUser(int userId);
+        Task<IdentityResult> UnblockUser(int userId);
+        Task<List<UserViewDto>> GetAllUsers();
     }
 }
