@@ -7,16 +7,10 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
-using MailKit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using System.Linq;
 using System.Net;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
@@ -32,7 +26,7 @@ namespace Core.Services
         private readonly ISmtpEmailService _emailService;
         private readonly AsosDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IFotoAvatar _fotoAvatar;
+        private readonly IFotoAvatar _fotoAvatar;       
 
         public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
@@ -52,7 +46,7 @@ namespace Core.Services
             _context = context;
             _configuration = configuration;
             _userEntity = userEntity;
-            _fotoAvatar = fotoAvatar;
+            _fotoAvatar = fotoAvatar;           
         }
 
         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
@@ -99,8 +93,6 @@ namespace Core.Services
 
                 throw;
             }
-
-
 
             return user;
         }
