@@ -10,10 +10,13 @@ using Infrastructure.Interfaces;
 using MailKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.Linq;
 using System.Net;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
@@ -151,6 +154,12 @@ namespace Core.Services
             {
                 throw new CustomHttpException($"Невірний пароль", HttpStatusCode.NotFound);
             }
+
+            if(user.LockoutEnabled==true) 
+            {
+                throw new CustomHttpException($"Користувач {user.FirstName} {user.LastName} заблокований до {user.LockoutEnd.Value} років", HttpStatusCode.NotFound);
+            }
+
             var token = await _jwtTokenService.CreateToken(user);
 
             return token;
@@ -162,8 +171,7 @@ namespace Core.Services
             UserEntity user = _mapper.Map<UserEntity>(dto);
 
             // Перевірка, чи такий email вже зареєстрований
-            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
-
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);            
 
             if (existingUser == null)
             {
@@ -206,8 +214,6 @@ namespace Core.Services
                 var errors = string.Join(", ", resultRole.Errors.Select(e => e.Description));
                 throw new CustomHttpException($"Не вдалося додати роль користувачу: {errors}", HttpStatusCode.BadRequest);
             }
-
-
         }
 
         public async Task<UserEntity> GetUserById(int id)
@@ -261,6 +267,50 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<IdentityResult> BlockUser(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());//.GetByIDAsync(userId);
+
+            if (user == null)
+            {
+                throw new CustomHttpException($"Користувача з Id = {userId} не знайдено", HttpStatusCode.NotFound);
+            }
+
+           var result = await _userManager.SetLockoutEnabledAsync(user, true);
+            if(result.Succeeded)
+                result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+
+
+            return result;
+            
+        }
+
+        public async Task<IdentityResult> UnblockUser(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());//.GetByIDAsync(userId);
+
+            if (user == null)
+            {
+                throw new CustomHttpException($"Користувача з Id = {userId} не знайдено", HttpStatusCode.NotFound);
+            }
+
+            var result = await _userManager.SetLockoutEnabledAsync(user, false);
+            if (result.Succeeded)                
+               result = await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+
+
+            return result;
+        }
+
+        public async Task<List<UserViewDto>> GetAllUsers()
+        {
+            var users = await _userEntity.GetIQueryable()
+                .Include(x=>x.UserRoles).ThenInclude(ur=>ur.Role)                
+                .ToListAsync();
+
+
+            return _mapper.Map<List<UserViewDto>>(users);
+        }
 
     }
 }
