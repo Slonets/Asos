@@ -17,11 +17,6 @@ namespace Core.Validator
             .NotEmpty().WithMessage("Введіть пароль")
             .MinimumLength(5).WithMessage("Пароль не може містити менше 5 символів");
 
-            RuleFor(reg => reg.ConfirmPassword)
-            .NotEmpty().WithMessage("Поле порожнє")
-            .MinimumLength(5).WithMessage("Не може бути менше 5 символів")
-            .Equal(reg => reg.Password).WithMessage("Паролі не співпадають");
-
             RuleFor(reg => reg.FirstName)
             .NotEmpty().WithMessage("Поле порожнє")
             .NotNull().WithMessage("Ім'я не може бути порожнім")

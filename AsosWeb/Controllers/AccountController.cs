@@ -79,8 +79,17 @@ namespace AsosWeb.Controllers
 
             if (validationResult.IsValid)
             {
-                await _accountService.Registration(model);
-                return Ok();
+                var result = await _accountService.Registration(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+
+                }
+                else
+                {
+                    return BadRequest(result);
+                }               
             }
             else
             {
