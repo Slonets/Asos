@@ -6,7 +6,7 @@ namespace Core.Interfaces
 {
     public interface IAccountService
     {
-        Task<string> Login(LoginDto loginDto);
+        Task<LoginResultDto> Login(LoginDto loginDto);
         Task Registration(RegisterDto dto);
         Task<UserEntity> GoogleSignInAsync(GoogleSignInDto loginDto);
         Task EditUserAsync(EditUserDto editUserDto);

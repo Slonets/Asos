@@ -132,29 +132,39 @@ namespace Core.Services
             return _context.Users.Any(user => user.Email == email);
         }
 
-        public async Task<string> Login(LoginDto model)
+        public async Task<LoginResultDto> Login(LoginDto model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
 
+            LoginResultDto loginResultDto = new LoginResultDto();
+
             if (user == null)
             {
-                throw new CustomHttpException($"Невірний логін", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = "Не вірно вказано дані!";
+                return loginResultDto;
             }
             var isAuth = await _userManager.CheckPasswordAsync(user, model.Password);
 
             if (!isAuth)
             {
-                throw new CustomHttpException($"Невірний пароль", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = "Не вірно вказано дані!";
+                return loginResultDto;
             }
 
             if(user.LockoutEnabled==true) 
             {
-                throw new CustomHttpException($"Користувач {user.FirstName} {user.LastName} заблокований до {user.LockoutEnd.Value} років", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = $"Користувач {user.FirstName} {user.LastName} заблокований до {user.LockoutEnd.Value} років";
+                return loginResultDto;
             }
 
             var token = await _jwtTokenService.CreateToken(user);
+            loginResultDto.Token = token;
+            loginResultDto.IsSuccess=true;
 
-            return token;
+            return loginResultDto;
         }
 
         public async Task Registration(RegisterDto dto)
