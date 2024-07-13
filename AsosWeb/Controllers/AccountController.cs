@@ -44,20 +44,29 @@ namespace AsosWeb.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            var validator = new LoginValidator();
-
-            var validationResult = validator.Validate(model);
-
-            if (validationResult.IsValid)
+            try
             {
-                var token = await _accountService.Login(model);
+                //var validator = new LoginValidator();
 
-                return Ok(new { token });
+                //var validationResult = validator.Validate(model);
+
+                //if (validationResult.IsValid)
+                //{
+                    var token = await _accountService.Login(model);
+
+                    return Ok(new { token });
+                //}
+                //else
+                //{
+                //    return BadRequest(validationResult.Errors);
+                //}
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(validationResult.Errors);
-            }          
+
+                return BadRequest(ex);
+            }
+            
         }
 
        
