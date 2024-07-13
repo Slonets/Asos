@@ -141,7 +141,7 @@ namespace Core.Services
             if (user == null)
             {
                 loginResultDto.IsSuccess = false;
-                loginResultDto.Error = "Не вірно вказано дані!";
+                loginResultDto.Error = "Incorect data!";
                 return loginResultDto;
             }
             var isAuth = await _userManager.CheckPasswordAsync(user, model.Password);
@@ -149,14 +149,14 @@ namespace Core.Services
             if (!isAuth)
             {
                 loginResultDto.IsSuccess = false;
-                loginResultDto.Error = "Не вірно вказано дані!";
+                loginResultDto.Error = "Incorect data!";
                 return loginResultDto;
             }
 
             if(user.LockoutEnabled==true) 
             {
                 loginResultDto.IsSuccess = false;
-                loginResultDto.Error = $"Користувач {user.FirstName} {user.LastName} заблокований до {user.LockoutEnd.Value} років";
+                loginResultDto.Error = $"User {user.FirstName} {user.LastName} locked to {user.LockoutEnd.Value} years";
                 return loginResultDto;
             }
 
