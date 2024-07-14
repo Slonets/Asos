@@ -29,8 +29,11 @@ namespace Core.Services
             var roles = await _userManager.GetRolesAsync(user);
             List<Claim> claims = new()
             {
+                new Claim("id", user.Id.ToString()),
+                new Claim("firstName", user.FirstName),
+                new Claim("lastName", user.LastName),
                 new Claim("email", user.Email),
-                new Claim("name", $"{user.FirstName} {user.LastName}"),
+                new Claim("phoneNumber", user.PhoneNumber??string.Empty),                
                 new Claim("image", user.Image ?? string.Empty)
             };
 
