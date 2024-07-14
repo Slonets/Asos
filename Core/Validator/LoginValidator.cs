@@ -13,13 +13,13 @@ namespace Core.Validator
         public LoginValidator() 
         {
             RuleFor(reg => reg.Email)
-               .NotNull().WithMessage("Email не може бути порожній") //гарантуємо, що не буде порожній
-               .NotEmpty().WithMessage("Email не може містити пробілів") //якщо це рядок, то не має бути пробілів
-               .EmailAddress().WithMessage("Неправильний email формат");
+               .NotNull().WithMessage("Email is empty") //гарантуємо, що не буде порожній
+               .NotEmpty().WithMessage("Email can't white space") //якщо це рядок, то не має бути пробілів
+               .EmailAddress().WithMessage("Incorect email format");
 
             RuleFor(reg => reg.Password)
-            .NotEmpty().WithMessage("Введіть пароль")
-            .MinimumLength(5).WithMessage("Пароль не може містити менше 5 символів");
+            .NotEmpty().WithMessage("Enter Password")
+            .MinimumLength(5).WithMessage("The password cannot be less than 5 characters");
         }
     }
 }

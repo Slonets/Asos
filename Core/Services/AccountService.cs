@@ -7,16 +7,11 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
-using MailKit;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using System.Linq;
 using System.Net;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
@@ -32,7 +27,7 @@ namespace Core.Services
         private readonly ISmtpEmailService _emailService;
         private readonly AsosDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IFotoAvatar _fotoAvatar;
+        private readonly IFotoAvatar _fotoAvatar;       
 
         public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
@@ -52,7 +47,7 @@ namespace Core.Services
             _context = context;
             _configuration = configuration;
             _userEntity = userEntity;
-            _fotoAvatar = fotoAvatar;
+            _fotoAvatar = fotoAvatar;           
         }
 
         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
@@ -100,8 +95,6 @@ namespace Core.Services
                 throw;
             }
 
-
-
             return user;
         }
 
@@ -140,33 +133,48 @@ namespace Core.Services
             return _context.Users.Any(user => user.Email == email);
         }
 
-        public async Task<string> Login(LoginDto model)
+        public async Task<LoginResultDto> Login(LoginDto model)
         {
+
+            _userManager.
+
             var user = await _userManager.FindByEmailAsync(model.Email);
+
+            LoginResultDto loginResultDto = new LoginResultDto();
 
             if (user == null)
             {
-                throw new CustomHttpException($"Невірний логін", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = "Incorect data!";
+                return loginResultDto;
             }
             var isAuth = await _userManager.CheckPasswordAsync(user, model.Password);
 
             if (!isAuth)
             {
-                throw new CustomHttpException($"Невірний пароль", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = "Incorect data!";
+                return loginResultDto;
             }
 
             if(user.LockoutEnabled==true) 
             {
-                throw new CustomHttpException($"Користувач {user.FirstName} {user.LastName} заблокований до {user.LockoutEnd.Value} років", HttpStatusCode.NotFound);
+                loginResultDto.IsSuccess = false;
+                loginResultDto.Error = $"User {user.FirstName} {user.LastName} locked to {user.LockoutEnd.Value} years";
+                return loginResultDto;
             }
 
             var token = await _jwtTokenService.CreateToken(user);
+            loginResultDto.Token = token;
+            loginResultDto.IsSuccess=true;
 
-            return token;
+            return loginResultDto;
         }
 
-        public async Task Registration(RegisterDto dto)
+        public async Task<RegisterResultDto> Registration(RegisterDto dto)
         {
+            RegisterResultDto registerResultDto = new RegisterResultDto();
+
             // Маппінг об'єкта dto на об'єкт UserEntity за допомогою _mapper
             UserEntity user = _mapper.Map<UserEntity>(dto);
 
@@ -178,14 +186,14 @@ namespace Core.Services
                 // Асинхронне створення нового користувача з паролем
                 var resultCreated = await _userManager.CreateAsync(user, dto.Password);
 
-
                 // Перевірка результату створення користувача
                 if (!resultCreated.Succeeded)
                 {
+                    registerResultDto.IsSuccess = false;
                     // Логування помилок створення користувача
-                    var errors = string.Join(", ", resultCreated.Errors.Select(e => e.Description));
-                    throw new CustomHttpException($"Не вдалося створити користувача: {errors}", HttpStatusCode.BadRequest);
-                }
+                    registerResultDto.Error = string.Join($"Не вдалося створити користувача", ",", resultCreated.Errors.Select(e => e.Description));
+                    return registerResultDto;                  
+                }                
 
                 if (resultCreated.Succeeded)
                 {
@@ -195,13 +203,17 @@ namespace Core.Services
                     }
                     catch (Exception ex)
                     {
-                        throw new CustomHttpException("Лист на пошту відправити не вдалося", HttpStatusCode.BadRequest);
+                        registerResultDto.IsSuccess = false;
+                        registerResultDto.Error = $"Лист на пошту відправити не вдалося";
+                        return registerResultDto;
                     }
                 }
             }
             else
             {
-                throw new CustomHttpException("Така пошта уже зареєстрована", HttpStatusCode.BadRequest);
+                registerResultDto.IsSuccess = false;
+                registerResultDto.Error = $"Така пошта уже зареєстрована";
+                return registerResultDto;                
             }
 
             // Асинхронне додавання створеного користувача до певної ролі
@@ -210,35 +222,30 @@ namespace Core.Services
             // Перевірка результату додавання до ролі
             if (!resultRole.Succeeded)
             {
-                // Логування помилок додавання до ролі
-                var errors = string.Join(", ", resultRole.Errors.Select(e => e.Description));
-                throw new CustomHttpException($"Не вдалося додати роль користувачу: {errors}", HttpStatusCode.BadRequest);
+                registerResultDto.IsSuccess = false;
+                registerResultDto.Error = string.Join($"Не вдалося додати роль користувачу:", ", ", resultRole.Errors.Select(e => e.Description));
+                return registerResultDto;               
+            }
+            else
+            {
+                registerResultDto.IsSuccess = true;
+                return registerResultDto;
             }
         }
 
         public async Task<UserEntity> GetUserById(int id)
-        {
-            var user = await _userEntity.GetByIDAsync(id);
+        {         
 
-            if (user == null)
-            {
-                throw new CustomHttpException($"Користувача не знайдено", HttpStatusCode.NotFound);
-            }
-            else
-            {
-                return user;
-            }
+            var user = await _userEntity.GetByIDAsync(id);
+            
+            return user;       
+                               
         }
 
         // Асинхронний метод для зміни даних користувача
         public async Task EditUserAsync(EditUserDto editUserDto)
         {
-            var user = await _userEntity.GetByIDAsync(editUserDto.Id);
-
-            if (user == null)
-            {
-                throw new CustomHttpException($"Користувача з Id = {editUserDto.Id} не знайдено", HttpStatusCode.NotFound);
-            }
+            var user = await _userEntity.GetByIDAsync(editUserDto.Id);            
 
             // Синхронні операції зміни даних
             user.FirstName = editUserDto.FirstName;
@@ -271,33 +278,28 @@ namespace Core.Services
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());//.GetByIDAsync(userId);
 
-            if (user == null)
-            {
-                throw new CustomHttpException($"Користувача з Id = {userId} не знайдено", HttpStatusCode.NotFound);
-            }
-
-           var result = await _userManager.SetLockoutEnabledAsync(user, true);
-            if(result.Succeeded)
-                result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
-
-
-            return result;
             
+           var result = await _userManager.SetLockoutEnabledAsync(user, true);
+            
+            if(result.Succeeded)
+            {
+                result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+            } 
+
+            return result;            
         }
 
         public async Task<IdentityResult> UnblockUser(int userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());//.GetByIDAsync(userId);
+            RegisterResultDto registerResultDto = new RegisterResultDto();
 
-            if (user == null)
-            {
-                throw new CustomHttpException($"Користувача з Id = {userId} не знайдено", HttpStatusCode.NotFound);
-            }
+            var user = await _userManager.FindByIdAsync(userId.ToString());           
 
             var result = await _userManager.SetLockoutEnabledAsync(user, false);
-            if (result.Succeeded)                
-               result = await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
-
+            if (result.Succeeded)
+            {
+                result = await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+            }
 
             return result;
         }
