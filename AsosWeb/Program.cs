@@ -1,11 +1,20 @@
 using AsosWeb;
 using Core;
+using Core.Helpers;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +25,34 @@ builder.Services.AddControllers();
 //додаЇмо –епозитор≥й
 builder.Services.AddRepository();
 
+    
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Description = "Jwt Auth header using the Bearer scheme",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer"
+        }
+        
+    );
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            new List<string>()
+        }
+    });
+    options.SchemaFilter<EnumSchemaFilter>();
+});
 
 builder.Services.AddAutoMapper();
 
@@ -30,17 +64,68 @@ opt.UseNpgsql(builder.Configuration.GetConnectionString("DataConnection")));
 
 builder.Services.AddIdentity<UserEntity, RoleEntity>(options =>
 {
-    options.Stores.MaxLengthForKeys = 128;
+    //options.Stores.MaxLengthForKeys = 128;
     options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 5;
+    //options.Password.RequiredLength = 5;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
+
+    options.Lockout.AllowedForNewUsers = false;
+    // Default Lockout settings.
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    //options.Lockout.AllowedForNewUsers = true;
 
     //options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AsosDbContext>()
 .AddDefaultTokenProviders();
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", builder =>
+//    {
+//        builder.AllowAnyHeader()
+//        .AllowAnyMethod()
+//        .AllowAnyOrigin();
+
+//    });
+//});
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//})
+//    .AddCookie()
+//    .AddGoogle(googleOptions =>
+//    {
+//        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+//        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+//    });
+
+var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<String>("JWTSecretKey")));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(cfg =>
+{
+    cfg.RequireHttpsMetadata = false;
+    cfg.SaveToken = true;
+    cfg.TokenValidationParameters = new TokenValidationParameters()
+    {
+        IssuerSigningKey = signinKey,
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 var app = builder.Build();
 
@@ -54,23 +139,30 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
+
 app.UseAuthorization();
+
 
 app.MapControllers();
 
+app.UseStaticFiles();
+
 app.SeedData();
 
-var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+//var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-if (!Directory.Exists(dir))
-{
-    Directory.CreateDirectory(dir);
-}
+//if (!Directory.Exists(dir))
+//{
+//    Directory.CreateDirectory(dir);
+//}
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(dir),
-    RequestPath = "/images"
-});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(dir),
+//    RequestPath = "/wwwroot"
+//});
+
+app.UseStaticFiles();
 
 app.Run();

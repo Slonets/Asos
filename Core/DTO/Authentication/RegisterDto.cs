@@ -15,6 +15,6 @@ namespace Core.DTO.Authentication
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
-        public IFormFile? Image { get; set; }    
+        public string Image { get; set; } = string.Empty;        
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Entities;
-using Infrastructure.Entities.Categories;
+using Infrastructure.Entities.Site;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +10,11 @@ namespace Infrastructure.Data
           IdentityUserClaim<int>, UserRoleEntity, IdentityUserLogin<int>,
           IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
+        public DbSet<BrandEntity> Brands { get; set; }
+        public DbSet<CategoryEntity> Category { get; set; }
+        public DbSet<SubCategoryEntity> SubCategories { get; set; }
+        public DbSet<ProductEntity> Products { get; set; }
+        public DbSet<ProductImageEntity> ProductImages { get; set; }
         public AsosDbContext(DbContextOptions<AsosDbContext> options)
         : base(options) { }
 
@@ -32,7 +37,6 @@ namespace Infrastructure.Data
                     .HasForeignKey(u => u.UserId)
                     .IsRequired();
             });
-            
         }
         
     }
