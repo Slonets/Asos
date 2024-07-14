@@ -30,7 +30,7 @@ namespace AsosWeb.Controllers
         [HttpGet("GetAllCategory")]
         public async Task<IActionResult> GetAllCategory()
         {
-            return Ok(await _categoryService.GettAll());
+            return Ok(await _categoryService.GetAllAsync());
         }
         [HttpGet("GetAllSubCategory")]
         public async Task<IActionResult> GetAllSubCategory()

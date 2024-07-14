@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.DTO;
 using Core.DTO.Site.Category;
 using Core.DTO.Site.Product;
 using Infrastructure.Entities.Site;
@@ -15,6 +16,8 @@ namespace Core.Mapper
         public CategoryProfile()
         {
             CreateMap<CategoryDto, CategoryEntity>().ReverseMap();
+            CreateMap<CreateCategoryDTO, CategoryEntity>().ReverseMap();
+            CreateMap<EditCategoryDTO, CategoryEntity>().ReverseMap();
         }
     }
 }
