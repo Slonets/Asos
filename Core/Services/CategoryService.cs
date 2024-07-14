@@ -4,8 +4,8 @@ using Core.DTO.Site.Category;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.Entities.Categories;
 using Infrastructure.Interfaces;
+using Infrastructure.Entities.Site;
 
 namespace Core.Services
 {
@@ -39,7 +39,7 @@ namespace Core.Services
             }
         }
 
-        public async Task EditAsync(EditCategoryDTO editCategoryDTO)
+        public async Task EditAsync(EditCategoryDto editCategoryDTO)
         {
             var category = _mapper.Map<CategoryEntity>(editCategoryDTO);
 

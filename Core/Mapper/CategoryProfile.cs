@@ -17,7 +17,7 @@ namespace Core.Mapper
         {
             CreateMap<CategoryDto, CategoryEntity>().ReverseMap();
             CreateMap<CreateCategoryDTO, CategoryEntity>().ReverseMap();
-            CreateMap<EditCategoryDTO, CategoryEntity>().ReverseMap();
+            CreateMap<EditCategoryDto, CategoryEntity>().ReverseMap();
         }
     }
 }

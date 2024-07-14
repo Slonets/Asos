@@ -136,8 +136,6 @@ namespace Core.Services
         public async Task<LoginResultDto> Login(LoginDto model)
         {
 
-            _userManager.
-
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             LoginResultDto loginResultDto = new LoginResultDto();

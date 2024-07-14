@@ -2,7 +2,7 @@
 
 namespace Core.DTO
 {
-    public class EditCategoryDTO
+    public class EditCategoryDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

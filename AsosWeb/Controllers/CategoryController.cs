@@ -2,7 +2,7 @@
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebKrot.Controllers
+namespace AsosWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +20,7 @@ namespace WebKrot.Controllers
             return Ok(await _category.GetByIdAsync(id));
         }
 
-        [HttpGet("CategoryGetAsync")]
+        [HttpGet("GetCategory")]
         public async Task<IActionResult> CategoryGetAllAsync()
         {
             return Ok(await _category.GetAllAsync());
@@ -41,7 +41,7 @@ namespace WebKrot.Controllers
         }
 
         [HttpPut("EditCategory")]
-        public async Task<IActionResult> EditProduct([FromForm]EditCategoryDTO editCategoryDTO)
+        public async Task<IActionResult> EditProduct([FromForm]EditCategoryDto editCategoryDTO)
         {
             await _category.EditAsync(editCategoryDTO);
             return Ok();

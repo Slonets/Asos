@@ -14,6 +14,6 @@ namespace Core.Interfaces
         Task<CategoryDto?> GetByIdAsync(int id);
         Task CreateAsync(CreateCategoryDTO createCategoryDTO);
         Task DeleteCategoryByIDAsync(int id);
-        Task EditAsync(EditCategoryDTO editCategoryDTO);
+        Task EditAsync(EditCategoryDto editCategoryDTO);
     }
 }
