@@ -249,8 +249,7 @@ namespace Core.Services
             user.FirstName = editUserDto.FirstName;
             user.LastName = editUserDto.LastName;
             user.PhoneNumber = editUserDto.PhoneNumber;
-            user.Email = editUserDto.Email;
-            user.Birthday = editUserDto.Birthday;
+            user.Email = editUserDto.Email;           
 
             if (editUserDto.Image != null)
             {
