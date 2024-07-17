@@ -134,9 +134,7 @@ namespace Core.Services
         }
 
         public async Task<LoginResultDto> Login(LoginDto model)
-        {
-
-            _userManager.
+        {        
 
             var user = await _userManager.FindByEmailAsync(model.Email);
 
@@ -251,8 +249,7 @@ namespace Core.Services
             user.FirstName = editUserDto.FirstName;
             user.LastName = editUserDto.LastName;
             user.PhoneNumber = editUserDto.PhoneNumber;
-            user.Email = editUserDto.Email;
-            
+            user.Email = editUserDto.Email;           
 
             if (editUserDto.Image != null)
             {

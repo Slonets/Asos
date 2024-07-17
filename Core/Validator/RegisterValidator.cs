@@ -7,15 +7,15 @@ namespace Core.Validator
     {
        
         public RegisterValidator()
-        {            
+        {
             RuleFor(reg => reg.Email)
-            .NotNull().WithMessage("Email не може бути порожній") //гарантуємо, що не буде порожній
-            .NotEmpty().WithMessage("Email не може містити пробілів") //якщо це рядок, то не має бути пробілів
-            .EmailAddress().WithMessage("Неправильний email формат");
+            .NotNull().WithMessage("Email cannot be null") // Гарантуємо, що не буде порожнім
+            .NotEmpty().WithMessage("Email cannot be empty") // Якщо це рядок, то не має бути пробілів
+            .EmailAddress().WithMessage("Invalid email format");
 
             RuleFor(reg => reg.Password)
-            .NotEmpty().WithMessage("Введіть пароль")
-            .MinimumLength(5).WithMessage("Пароль не може містити менше 5 символів");
+            .NotEmpty().WithMessage("Please enter a password")
+            .MinimumLength(5).WithMessage("Password must be at least 5 characters long");
 
             RuleFor(reg => reg.FirstName)
             .NotEmpty().WithMessage("Поле порожнє")
@@ -31,14 +31,7 @@ namespace Core.Validator
             .MaximumLength(24).WithMessage("Прізвище не може бути більшим за 24 символи")
             .MinimumLength(5).WithMessage("Прізвище не може мати менше 5 символів")
             .Matches("[A-Z]").WithMessage("Прізвище повинно містити хоч одну велику літеру")
-            .Matches("[a-z]").WithMessage("Прізвище повинно містити хоч одну малу літеру");
-
-            RuleFor(reg => reg.PhoneNumber)
-            .NotEmpty().WithMessage("Поле порожнє")
-            .NotNull().WithMessage("Телефон не може бути порожнім")
-            .MaximumLength(30).WithMessage("Телефон  не може бути більшим за 30 символи")
-            .MinimumLength(5).WithMessage("Телефон не може мати менше 5 символів")
-            .Matches(@"^\d+$").WithMessage("Номер телефону повинен містити тільки цифри");
+            .Matches("[a-z]").WithMessage("Прізвище повинно містити хоч одну малу літеру");            
         }        
     }
 }
