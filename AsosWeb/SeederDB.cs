@@ -61,25 +61,25 @@ namespace AsosWeb
                 if (!context.Brands.Any())
                 {
                     context.Brands.AddRange(
-                         new BrandEntity { Id = 1, Name = "Nike" },
-                         new BrandEntity { Id = 2, Name = "Adidas" },
-                         new BrandEntity { Id = 3, Name = "Asos" }
+                         new BrandEntity {  Name = "Nike" },
+                         new BrandEntity {  Name = "Adidas" },
+                         new BrandEntity {  Name = "Asos" }
                         );
                 }
                 if (!context.Category.Any())
                 {
                     context.Category.AddRange(
-                        new CategoryEntity { Id = 1, Name = "Clothing" },
-                        new CategoryEntity { Id = 2, Name = "Sportswear" },
-                        new CategoryEntity { Id = 3, Name = "Accessories" }
+                        new CategoryEntity {  Name = "Clothing" },
+                        new CategoryEntity {  Name = "Sportswear" },
+                        new CategoryEntity {  Name = "Accessories" }
                         );
                 }
                 if (!context.SubCategories.Any())
                 {
                     context.SubCategories.AddRange(
-                        new SubCategoryEntity { Id = 1, Name = "Shirts", CategoryId = 1 },
-                        new SubCategoryEntity { Id = 2, Name = "Joggers", CategoryId = 2 },
-                        new SubCategoryEntity { Id = 3, Name = "Rings", CategoryId = 3 }
+                        new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
+                        new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
+                        new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
                         );
                 }
                 if (!context.Products.Any())
@@ -87,7 +87,7 @@ namespace AsosWeb
                     context.Products.AddRange(
                     new ProductEntity
                     {
-                        Id = 1,
+                        
                         Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
                         Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
                         Price = 50,
@@ -104,7 +104,7 @@ namespace AsosWeb
                     },
                     new ProductEntity
                     {
-                        Id = 2,
+                        
                         Name = "adidas Football Entrada 22 joggers in black",
                         Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
                         Price = 56,
@@ -121,7 +121,7 @@ namespace AsosWeb
                     },
                      new ProductEntity
                      {
-                         Id = 3,
+                        
                          Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
                          Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
                          Price = 27,
