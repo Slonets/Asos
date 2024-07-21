@@ -9,7 +9,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NETCore.MailKit.Core;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Security.Claims;
+using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AsosWeb.Controllers
 {
@@ -18,13 +24,13 @@ namespace AsosWeb.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IAccountService _accountService;        
-        private readonly IMapper _mapper;       
+        private readonly IAccountService _accountService;
+        private readonly IMapper _mapper;
 
         public AccountController(IAccountService accountService, IMapper mapper)
         {
             _accountService = accountService;
-            _mapper = mapper;            
+            _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -44,15 +50,23 @@ namespace AsosWeb.Controllers
             {
                 await _accountService.Registration(model);
                 return Ok();
-                
+
             }
             catch (Exception ex)
             {
 
                 return BadRequest(ex.Message);
-            }           
+            }
 
-         
+
         }
+
+       
+
+
+
+
     }
+
+
 }

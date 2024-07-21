@@ -24,6 +24,11 @@ builder.Services.AddAutoMapper();
 
 builder.Services.AddCustomService();
 
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opts => opts.TokenLifespan = TimeSpan.FromHours(10));//////////////////////////////
+
+
+
 //Рядок підключення
 builder.Services.AddDbContext<AsosDbContext>(opt =>
 opt.UseNpgsql(builder.Configuration.GetConnectionString("DataConnection")));
