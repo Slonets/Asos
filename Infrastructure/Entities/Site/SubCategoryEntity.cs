@@ -12,7 +12,7 @@ namespace Infrastructure.Entities.Site
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public CategoryEntity Category { get; set; }
         public ICollection<ProductEntity> Products { get; set; }
     }
