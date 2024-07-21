@@ -49,10 +49,10 @@ namespace Infrastructure.Data
                 .WithOne(p => p.Category)
                 .HasForeignKey(p=>p.CategoryId);
 
-            builder.Entity<SubCategoryEntity>()
+           /* builder.Entity<SubCategoryEntity>()
                 .HasMany(s => s.Products)
                 .WithOne(p => p.SubCategory)
-                .HasForeignKey(p => p.SubCategoryId);
+                .HasForeignKey(p => p.SubCategoryId);*/
 
             builder.Entity<ProductEntity>()
                 .HasMany(p=>p.productImages)

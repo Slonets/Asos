@@ -20,7 +20,7 @@ namespace Core.DTO.Site.Product
         public string Color { get; set; }
         public int BrandId { get; set; }
         public int CategoryId { get; set; }
-        public int SubCategoryId { get; set; }
+       // public int SubCategoryId { get; set; }
         public Gender Gender { get; set; }
         public string SizeAndFit { get; set; }
         public string LookAfterMe { get; set; }

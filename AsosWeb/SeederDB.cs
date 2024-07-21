@@ -10,7 +10,7 @@ namespace AsosWeb
 {
     public static class SeederDB
     {
-       
+
         public static void SeedData(this IApplicationBuilder app)
         {
             using (var scope = app.ApplicationServices
@@ -55,23 +55,23 @@ namespace AsosWeb
                         result = userManager.AddToRoleAsync(user, Roles.Admin).Result;
                     }
                     #endregion
-                   
+
                 }
                 #region Seed Brands, Categories, Subcategories, Products
                 if (!context.Brands.Any())
                 {
                     context.Brands.AddRange(
-                         new BrandEntity {  Name = "Nike" },
-                         new BrandEntity {  Name = "Adidas" },
-                         new BrandEntity {  Name = "Asos" }
+                         new BrandEntity { Name = "Nike" },
+                         new BrandEntity { Name = "Adidas" },
+                         new BrandEntity { Name = "Asos" }
                         );
                 }
                 if (!context.Category.Any())
                 {
                     context.Category.AddRange(
-                        new CategoryEntity {  Name = "Clothing" },
-                        new CategoryEntity {  Name = "Sportswear" },
-                        new CategoryEntity {  Name = "Accessories" }
+                        new CategoryEntity { Id = 1, Name = "Clothing" },
+                        new CategoryEntity { Id = 2, Name = "Sportswear" },
+                        new CategoryEntity { Id = 3, Name = "Accessories" }
                         );
                 }
                 if (!context.SubCategories.Any())
@@ -82,20 +82,17 @@ namespace AsosWeb
                         new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
                         );
                 }
-                if (!context.Products.Any())
+              /*  if (!context.Products.Any())
                 {
                     context.Products.AddRange(
                     new ProductEntity
                     {
-                        
+
                         Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
                         Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
                         Price = 50,
                         Size = Size.M,
                         Color = "green",
-                        BrandId = 1,
-                        CategoryId = 1,
-                        SubCategoryId = 1,
                         Gender = Gender.Male,
                         SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
                         LookAfterMe = "Machine wash according to instructions on care label",
@@ -104,15 +101,12 @@ namespace AsosWeb
                     },
                     new ProductEntity
                     {
-                        
+
                         Name = "adidas Football Entrada 22 joggers in black",
                         Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
                         Price = 56,
                         Size = Size.L,
                         Color = "black",
-                        BrandId = 2,
-                        CategoryId = 2,
-                        SubCategoryId = 2,
                         Gender = Gender.Male,
                         SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
                         LookAfterMe = "Machine wash according to instructions on care label",
@@ -121,15 +115,12 @@ namespace AsosWeb
                     },
                      new ProductEntity
                      {
-                        
+
                          Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
                          Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
                          Price = 27,
                          Size = Size.L,
                          Color = "black",
-                         BrandId = 3,
-                         CategoryId = 3,
-                         SubCategoryId = 3,
                          Gender = Gender.Male,
                          SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
                          LookAfterMe = "Wipe clean with a soft dry cloth",
@@ -137,7 +128,7 @@ namespace AsosWeb
 
                      }
 
-                 );
+                 );*/
                     context.SaveChanges();
                 }
                 #endregion
@@ -145,8 +136,8 @@ namespace AsosWeb
 
         }
 
-       
+
 
     }
-   
-}
+
+
