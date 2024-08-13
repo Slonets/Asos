@@ -249,7 +249,8 @@ namespace Core.Services
             user.FirstName = editUserDto.FirstName;
             user.LastName = editUserDto.LastName;
             user.PhoneNumber = editUserDto.PhoneNumber;
-            user.Email = editUserDto.Email;           
+            user.Email = editUserDto.Email; 
+            user.Birthday= editUserDto.Birthday;
 
             if (editUserDto.Image != null)
             {
@@ -259,7 +260,6 @@ namespace Core.Services
             await _userEntity.UpdateAsync(user);
             await _userEntity.SaveAsync();
         }
-
 
         // Асинхронний метод для зміни пароля користувача
         public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser)
