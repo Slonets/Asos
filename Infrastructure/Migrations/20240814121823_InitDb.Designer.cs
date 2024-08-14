@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AsosDbContext))]
-    [Migration("20240811134104_InitDb")]
+    [Migration("20240814121823_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -202,8 +202,8 @@ namespace Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Birthday")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

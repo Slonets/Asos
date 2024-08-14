@@ -30,14 +30,14 @@ namespace AsosWeb.Controllers
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
-        UserManager<UserEntity> userManager;
+        UserManager<UserEntity> _userManager;
 
-        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService)
+        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService, UserManager<UserEntity> userManager)
         {
             _accountService = accountService;
             _mapper = mapper;
             _jwtTokenService = jwtTokenService;
-
+            _userManager=userManager;
         }
 
         [AllowAnonymous]
@@ -125,7 +125,13 @@ namespace AsosWeb.Controllers
 
             await _accountService.EditUserAsync(editUserDto);
 
-            return Ok(new { message = "Дані користувача" + " " + editUserDto.FirstName + " " + editUserDto.LastName + " " + "було оновлено" });
+            string id = User.Claims.ToList()[0].Value.ToString();
+
+            var user = _userManager.FindByIdAsync(id).Result;
+
+            var token = await _jwtTokenService.CreateToken(user);
+
+            return Ok(new {token});            
         }
 
         [Authorize]
