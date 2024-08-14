@@ -243,23 +243,36 @@ namespace Core.Services
         // Асинхронний метод для зміни даних користувача
         public async Task EditUserAsync(EditUserDto editUserDto)
         {
-            var user = await _userEntity.GetByIDAsync(editUserDto.Id);            
+
+            string id = (editUserDto.Id).ToString();
+
+            var user = await _userManager.FindByIdAsync(id);            
 
             // Синхронні операції зміни даних
             user.FirstName = editUserDto.FirstName;
             user.LastName = editUserDto.LastName;
             user.PhoneNumber = editUserDto.PhoneNumber;
-            user.Email = editUserDto.Email;           
+            user.Email = editUserDto.Email;
+
+            // Преобразование даты в UTC перед сохранением
+            if (editUserDto.Birthday.HasValue)
+            {
+                user.Birthday = DateTime.SpecifyKind(editUserDto.Birthday.Value, DateTimeKind.Utc);
+            }
+            else
+            {
+                user.Birthday = null;
+            }
+
 
             if (editUserDto.Image != null)
             {
                 user.Image = editUserDto.Image;
             }
 
-            await _userEntity.UpdateAsync(user);
-            await _userEntity.SaveAsync();
+            await _userManager.UpdateAsync(user);
+           
         }
-
 
         // Асинхронний метод для зміни пароля користувача
         public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser)
