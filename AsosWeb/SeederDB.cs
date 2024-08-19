@@ -69,20 +69,21 @@ namespace AsosWeb
                 if (!context.Category.Any())
                 {
                     context.Category.AddRange(
-                        new CategoryEntity { Id = 1, Name = "Clothing" },
-                        new CategoryEntity { Id = 2, Name = "Sportswear" },
-                        new CategoryEntity { Id = 3, Name = "Accessories" }
+                        new CategoryEntity { Name = "Clothing" },
+                        new CategoryEntity { Name = "Sportswear" },
+                        new CategoryEntity { Name = "Accessories" }
                         );
                 }
                 if (!context.SubCategories.Any())
                 {
                     context.SubCategories.AddRange(
-                        new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
-                        new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
-                        new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
+                        new SubCategoryEntity {Id=1, Name = "Shirts"  },
+                        new SubCategoryEntity { Id = 2, Name = "Joggers" },
+                        new SubCategoryEntity { Id = 3, Name = "Rings" }
                         );
                 }
-              /*  if (!context.Products.Any())
+                //context.SaveChanges();
+                if (!context.Products.Any())
                 {
                     context.Products.AddRange(
                     new ProductEntity
@@ -94,9 +95,14 @@ namespace AsosWeb
                         Size = Size.M,
                         Color = "green",
                         Gender = Gender.Male,
+                        BrandId = 1,
+                        CategoryId = 2,
+                        SubCategoryId = 1,
                         SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
                         LookAfterMe = "Machine wash according to instructions on care label",
-                        AboutMe = "Linen: lightweight and strong, Main: 100% Linen."
+                        AboutMe = "Linen: lightweight and strong, Main: 100% Linen.",
+                        
+                        
 
                     },
                     new ProductEntity
@@ -108,9 +114,13 @@ namespace AsosWeb
                         Size = Size.L,
                         Color = "black",
                         Gender = Gender.Male,
+                        BrandId = 2,
+                        CategoryId = 3,
+                        SubCategoryId = 2,
                         SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
                         LookAfterMe = "Machine wash according to instructions on care label",
-                        AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester."
+                        AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester.",
+                        
 
                     },
                      new ProductEntity
@@ -122,22 +132,26 @@ namespace AsosWeb
                          Size = Size.L,
                          Color = "black",
                          Gender = Gender.Male,
+                         BrandId = 3,
+                         CategoryId = 1,
+                         SubCategoryId = 3,
                          SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
                          LookAfterMe = "Wipe clean with a soft dry cloth",
-                         AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel."
+                         AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel.",
+                         
 
                      }
 
-                 );*/
+                 );
                     context.SaveChanges();
                 }
                 #endregion
             }
 
         }
-
-
-
     }
+
+
+}
 
 

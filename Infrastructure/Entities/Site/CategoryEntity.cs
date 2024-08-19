@@ -12,7 +12,6 @@ namespace Infrastructure.Entities.Site
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public ICollection<SubCategoryEntity> SubCategories { get; set; }
         public ICollection<ProductEntity> Products { get; set; }
 
     }

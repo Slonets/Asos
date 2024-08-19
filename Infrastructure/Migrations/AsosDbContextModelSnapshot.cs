@@ -174,16 +174,11 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("SubCategories");
                 });
@@ -402,15 +397,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Site.SubCategoryEntity", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Site.CategoryEntity", "Category")
-                        .WithMany("SubCategories")
-                        .HasForeignKey("CategoryId");
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("Infrastructure.Entities.UserRoleEntity", b =>
                 {
                     b.HasOne("Infrastructure.Entities.RoleEntity", "Role")
@@ -479,8 +465,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Entities.Site.CategoryEntity", b =>
                 {
                     b.Navigation("Products");
-
-                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Site.ProductEntity", b =>

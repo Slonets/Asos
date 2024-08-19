@@ -22,7 +22,7 @@ namespace Infrastructure.Entities.Site
         public BrandEntity Brand { get; set; }
         public int? CategoryId { get; set; }
         public CategoryEntity Category { get; set; }
-        //public int? SubCategoryId { get; set; }
+        public int? SubCategoryId { get; set; }
         public SubCategoryEntity SubCategory { get; set; }
         public Gender Gender { get; set; }
         public string LookAfterMe { get; set; }
