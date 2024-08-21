@@ -9,9 +9,10 @@ namespace Core.Interfaces
         Task<LoginResultDto> Login(LoginDto loginDto);
         Task<RegisterResultDto> Registration(RegisterDto dto);
         Task<UserEntity> GoogleSignInAsync(GoogleSignInDto loginDto);
-        Task EditUserAsync(EditUserDto editUserDto);
+        Task EditUserAsync(EditUserDto editUserDto); 
+        Task EditAdrressUserAsync(EditAdrressUserDto editAdrressDto);
         Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser);
-        Task<UserEntity> GetUserById(int id);
+        Task<UserEntity> GetUser(string id);
         Task<IdentityResult> BlockUser(int userId);
         Task<IdentityResult> UnblockUser(int userId);
         Task<List<UserViewDto>> GetAllUsers();

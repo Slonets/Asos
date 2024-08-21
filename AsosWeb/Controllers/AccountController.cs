@@ -122,7 +122,6 @@ namespace AsosWeb.Controllers
         [HttpPut("edit-user")]
         public async Task<IActionResult> EditUser([FromForm] EditUserDto editUserDto)
         {
-
             await _accountService.EditUserAsync(editUserDto);
 
             string id = User.Claims.ToList()[0].Value.ToString();
@@ -132,6 +131,22 @@ namespace AsosWeb.Controllers
             var token = await _jwtTokenService.CreateToken(user);
 
             return Ok(new {token});            
+        }
+
+        [HttpPut("edit-adrress")]
+        public async Task<IActionResult> EditAdrressUser([FromForm] EditAdrressUserDto editDto)
+        {
+            await _accountService.EditAdrressUserAsync(editDto);
+
+            return Ok();
+
+            //string id = User.Claims.ToList()[0].Value.ToString();
+
+            //var user = _userManager.FindByIdAsync(id).Result;
+
+            //var token = await _jwtTokenService.CreateToken(user);
+
+            //return Ok(new { token });
         }
 
         [Authorize]
@@ -165,6 +180,17 @@ namespace AsosWeb.Controllers
         public async Task<IActionResult> BlockUser([FromBody] BlockUserDto model)
         {
             return Ok(await _accountService.BlockUser(model.UserId));
+        }
+
+        [Authorize]
+        [HttpGet("UserById")]
+        public async Task<IActionResult> GetUser()
+        {
+            string id = User.Claims.ToList()[0].Value.ToString();
+
+            var user = await _accountService.GetUser(id);            
+
+            return Ok(user);
         }
 
 
