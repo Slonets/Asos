@@ -1,9 +1,10 @@
-﻿using Infrastructure.Entities;
+﻿using Core.DTO.Authentication;
+using Infrastructure.Entities;
 
 namespace Core.Interfaces
 {
     public interface IJwtTokenService
     {
-        Task<string> CreateToken(UserEntity user);
+        Task<string> CreateToken(UserTokenInfoDto user);
     }
 }

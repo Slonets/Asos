@@ -63,8 +63,11 @@ namespace Core.Services
         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
         {
             Payload payload = await GetPayloadAsync(model.Credential);
-
-            UserEntity? user = await _userManager.FindByEmailAsync(payload.Email);
+            
+            var user = _context.Users
+                .Include(x=>x.Address)
+                .Include(x=>x.Address.Town)
+                .FirstOrDefault(x=>x.Email== payload.Email);            
 
             user ??= await CreateGoogleUserAsync(payload);
 
@@ -172,7 +175,24 @@ namespace Core.Services
                 return loginResultDto;
             }
 
-            var token = await _jwtTokenService.CreateToken(user);
+            var userToken = await _userEntity.GetIQueryable()
+          .Where(u => u.Id == user.Id)
+          .Include(u => u.Address)
+              .ThenInclude(a => a.Town)
+              .ThenInclude(t => t.Country)
+          .Select(u => new UserTokenInfoDto
+          {
+              Id = u.Id,
+              FirstName = u.FirstName,
+              LastName = u.LastName,
+              Address = u.Address.Street,
+              Town = u.Address.Town.NameTown,
+              Country = u.Address.Town.Country.Id
+          })
+          .FirstOrDefaultAsync();
+
+
+            var token = await _jwtTokenService.CreateToken(userToken);
             loginResultDto.Token = token;
             loginResultDto.IsSuccess=true;
 
@@ -292,33 +312,35 @@ namespace Core.Services
             user.PhoneNumber = editAdrressDto.PhoneNumber;
             user.PostCode = editAdrressDto.PostCode;
 
-            TownEntity townEntity;            
+            TownEntity townEntity=null;            
 
             if (editAdrressDto.Town!=null)
             {
                 townEntity = new TownEntity
                 {
                     NameTown = editAdrressDto.Town,
-                    CountryId = editAdrressDto.Id
+                    CountryId = editAdrressDto.Country,
                 };
 
-                await _townEntity.InsertAsync(townEntity);                
+                await _townEntity.InsertAsync(townEntity);
 
                 // Перевірте, чи потрібен параметр у цьому методі
-                await _townEntity.UpdateAsync(townEntity);
-            }
+                await _context.SaveChangesAsync();
+            }          
 
             if(editAdrressDto.Address != null)
             {
                 var addressEntity = new AddressEntity
                 {
                     Street = editAdrressDto.Address,
-                    TownId = editAdrressDto.Id
+                    TownId = townEntity.Id
                 };
 
                 await _addressEntity.InsertAsync(addressEntity);
 
-                user.AddressId = addressEntity.Id;
+                await _context.SaveChangesAsync();
+
+                user.AddressId = addressEntity.Id;               
             }
             
             await _userManager.UpdateAsync(user);
