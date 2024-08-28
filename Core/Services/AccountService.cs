@@ -175,24 +175,31 @@ namespace Core.Services
                 return loginResultDto;
             }
 
-            var userToken = await _userEntity.GetIQueryable()
-          .Where(u => u.Id == user.Id)
-          .Include(u => u.Address)
-              .ThenInclude(a => a.Town)
-              .ThenInclude(t => t.Country)
-          .Select(u => new UserTokenInfoDto
-          {
-              Id = u.Id,
-              FirstName = u.FirstName,
-              LastName = u.LastName,
-              Address = u.Address.Street,
-              Town = u.Address.Town.NameTown,
-              Country = u.Address.Town.Country.Id
-          })
-          .FirstOrDefaultAsync();
+            var person = _context.Users
+                .Include(x => x.Address)
+                .Include(x => x.Address.Town)
+                .FirstOrDefault(x => x.Id == user.Id);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var userTokenInfo = new UserTokenInfoDto
+            {
+                Id = person.Id,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Email = person.Email,
+                Birthday = person.Birthday?.ToString("dd-MM-yyyy"),
+                Image = person.Image,
+                PhoneNumber = person.PhoneNumber,
+                Country = person.Address?.Town.CountryId,
+                Town = person.Address?.Town.NameTown,
+                Address = person.Address?.Street,
+                PostCode = person.PostCode,
+                Roles = roles.ToList(),
+            };
 
 
-            var token = await _jwtTokenService.CreateToken(userToken);
+            var token = await _jwtTokenService.CreateToken(userTokenInfo);
             loginResultDto.Token = token;
             loginResultDto.IsSuccess=true;
 
