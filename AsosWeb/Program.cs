@@ -23,9 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //додаЇмо –епозитор≥й
-builder.Services.AddRepository();
-
-    
+builder.Services.AddRepository();    
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -66,10 +64,16 @@ builder.Services.AddIdentity<UserEntity, RoleEntity>(options =>
 {
     //options.Stores.MaxLengthForKeys = 128;
     options.Password.RequireDigit = false;
-    //options.Password.RequiredLength = 5;
+    options.Password.RequiredLength = 5;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
+
+    options.Lockout.AllowedForNewUsers = false;
+    // Default Lockout settings.
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    //options.Lockout.AllowedForNewUsers = true;
 
     //options.SignIn.RequireConfirmedEmail = true;
 })

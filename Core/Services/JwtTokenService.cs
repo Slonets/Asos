@@ -33,8 +33,9 @@ namespace Core.Services
                 new Claim("firstName", user.FirstName),
                 new Claim("lastName", user.LastName),
                 new Claim("email", user.Email),
-                new Claim("phoneNumber", user.PhoneNumber),                
-                new Claim("image", user.Image ?? string.Empty)
+                new Claim("phoneNumber", user.PhoneNumber??string.Empty),                
+                new Claim("image", user.Image ?? string.Empty),
+                new Claim("birthday", user.Birthday?.ToString("dd-MM-yyyy") ?? string.Empty)
             };
 
             foreach (var role in roles)

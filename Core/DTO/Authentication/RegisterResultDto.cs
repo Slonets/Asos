@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Core.DTO.Authentication
 {
-    public class LoginDto
+    public class RegisterResultDto
     {
-        public string? Email { get; set; }
-        public string? Password { get; set; }        
+        public bool IsSuccess { get; set; }
+        public string Error { get; set; } = String.Empty;
     }
 }

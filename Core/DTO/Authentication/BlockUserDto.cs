@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.DTO.Authentication
 {
-    public class LoginDto
+    public class BlockUserDto
     {
-        public string? Email { get; set; }
-        public string? Password { get; set; }        
+        public int UserId { get; set; }
     }
 }

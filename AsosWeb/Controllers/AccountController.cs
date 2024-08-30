@@ -27,40 +27,49 @@ namespace AsosWeb.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IAccountService _accountService;        
-        private readonly IMapper _mapper;    
+        private readonly IAccountService _accountService;
+        private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
-        UserManager<UserEntity> userManager;
+        UserManager<UserEntity> _userManager;
 
-        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService)
+        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService, UserManager<UserEntity> userManager)
         {
             _accountService = accountService;
             _mapper = mapper;
             _jwtTokenService = jwtTokenService;
-            
+            _userManager=userManager;
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
+
             var validator = new LoginValidator();
 
             var validationResult = validator.Validate(model);
 
-            if (validationResult.IsValid)
+            if (validationResult.IsValid) 
             {
-                var token = await _accountService.Login(model);
+                var result = await _accountService.Login(model);
 
-                return Ok(new { token });
+                if (result.IsSuccess)
+                {
+                
+                    return Ok(new { token = result.Token });
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
             }
             else
             {
                 return BadRequest(validationResult.Errors);
-            }          
+            }
         }
 
-       
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
@@ -70,13 +79,22 @@ namespace AsosWeb.Controllers
 
             if (validationResult.IsValid)
             {
-                await _accountService.Registration(model);
-                return Ok();
+                var result = await _accountService.Registration(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+
+                }
+                else
+                {
+                    return BadRequest(result);
+                }               
             }
             else
             {
                 return BadRequest(validationResult.Errors);
-            }         
+            }
         }
 
         [HttpPost("GoogleSignIn")]
@@ -105,9 +123,15 @@ namespace AsosWeb.Controllers
         public async Task<IActionResult> EditUser([FromForm] EditUserDto editUserDto)
         {
 
-             await _accountService.EditUserAsync(editUserDto);           
+            await _accountService.EditUserAsync(editUserDto);
 
-            return Ok(new { message = "Дані користувача"+ " "+ editUserDto.FirstName + " " + editUserDto.LastName+" "+ "було оновлено" });
+            string id = User.Claims.ToList()[0].Value.ToString();
+
+            var user = _userManager.FindByIdAsync(id).Result;
+
+            var token = await _jwtTokenService.CreateToken(user);
+
+            return Ok(new {token});            
         }
 
         [Authorize]
@@ -125,10 +149,29 @@ namespace AsosWeb.Controllers
                 return Ok(new { message = "Пароль успішно змінено" });
             }
             else
-            { 
-            return BadRequest(new { message = "Змінити пароль не вдалося", result });
+            {
+                return BadRequest(new { message = "Змінити пароль не вдалося", result });
             }
 
-        }        
+        }
+
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            return Ok(await _accountService.GetAllUsers());
+        }
+
+        [HttpPost("BlockUser")]
+        public async Task<IActionResult> BlockUser([FromBody] BlockUserDto model)
+        {
+            return Ok(await _accountService.BlockUser(model.UserId));
+        }
+
+
+        [HttpPost("UnBlockUser")]
+        public async Task<IActionResult> UnBlockUser(int userId)
+        {
+            return Ok(await _accountService.UnblockUser(userId));
+        }
     }
 }
