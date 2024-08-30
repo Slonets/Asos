@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AsosDbContext))]
-    [Migration("20240818115819_fixdb")]
-    partial class fixdb
+    [Migration("20240830092032_dbwithorders")]
+    partial class dbwithorders
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,6 +88,48 @@ namespace Infrastructure.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("Infrastructure.Entities.Site.OrderProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProducts");
+                });
+
+            modelBuilder.Entity("Infrastructure.Entities.Site.Orders", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Infrastructure.Entities.Site.ProductEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -133,16 +175,11 @@ namespace Infrastructure.Migrations
                     b.Property<string>("SizeAndFit")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("SubCategoryId");
 
                     b.ToTable("Products");
                 });
@@ -167,23 +204,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Site.SubCategoryEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SubCategories");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.UserEntity", b =>
@@ -368,6 +388,25 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Infrastructure.Entities.Site.OrderProduct", b =>
+                {
+                    b.HasOne("Infrastructure.Entities.Site.Orders", "Order")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Entities.Site.ProductEntity", "Product")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Infrastructure.Entities.Site.ProductEntity", b =>
                 {
                     b.HasOne("Infrastructure.Entities.Site.BrandEntity", "Brand")
@@ -378,15 +417,9 @@ namespace Infrastructure.Migrations
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("Infrastructure.Entities.Site.SubCategoryEntity", "SubCategory")
-                        .WithMany("Products")
-                        .HasForeignKey("SubCategoryId");
-
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
-
-                    b.Navigation("SubCategory");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Site.ProductImageEntity", b =>
@@ -470,14 +503,16 @@ namespace Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Site.ProductEntity", b =>
+            modelBuilder.Entity("Infrastructure.Entities.Site.Orders", b =>
                 {
-                    b.Navigation("productImages");
+                    b.Navigation("OrderProducts");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Site.SubCategoryEntity", b =>
+            modelBuilder.Entity("Infrastructure.Entities.Site.ProductEntity", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("OrderProducts");
+
+                    b.Navigation("productImages");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.UserEntity", b =>

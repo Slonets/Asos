@@ -54,10 +54,11 @@ namespace AsosWeb
                     {
                         result = userManager.AddToRoleAsync(user, Roles.Admin).Result;
                     }
+                }
                     #endregion
 
-                }
-                #region Seed Brands, Categories, Subcategories, Products
+                
+                #region Seed Brands, Categories, Products
                 if (!context.Brands.Any())
                 {
                     context.Brands.AddRange(
@@ -74,15 +75,6 @@ namespace AsosWeb
                         new CategoryEntity { Name = "Accessories" }
                         );
                 }
-                if (!context.SubCategories.Any())
-                {
-                    context.SubCategories.AddRange(
-                        new SubCategoryEntity {Id=1, Name = "Shirts"  },
-                        new SubCategoryEntity { Id = 2, Name = "Joggers" },
-                        new SubCategoryEntity { Id = 3, Name = "Rings" }
-                        );
-                }
-                //context.SaveChanges();
                 if (!context.Products.Any())
                 {
                     context.Products.AddRange(
@@ -97,7 +89,6 @@ namespace AsosWeb
                         Gender = Gender.Male,
                         BrandId = 1,
                         CategoryId = 2,
-                        SubCategoryId = 1,
                         SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
                         LookAfterMe = "Machine wash according to instructions on care label",
                         AboutMe = "Linen: lightweight and strong, Main: 100% Linen.",
@@ -116,7 +107,6 @@ namespace AsosWeb
                         Gender = Gender.Male,
                         BrandId = 2,
                         CategoryId = 3,
-                        SubCategoryId = 2,
                         SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
                         LookAfterMe = "Machine wash according to instructions on care label",
                         AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester.",
@@ -134,7 +124,6 @@ namespace AsosWeb
                          Gender = Gender.Male,
                          BrandId = 3,
                          CategoryId = 1,
-                         SubCategoryId = 3,
                          SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
                          LookAfterMe = "Wipe clean with a soft dry cloth",
                          AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel.",

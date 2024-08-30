@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class fixdb : Migration
+    public partial class initnewdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,19 +80,6 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Category", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SubCategories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SubCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -214,7 +201,6 @@ namespace Infrastructure.Migrations
                     Color = table.Column<string>(type: "text", nullable: true),
                     BrandId = table.Column<int>(type: "integer", nullable: true),
                     CategoryId = table.Column<int>(type: "integer", nullable: true),
-                    SubCategoryId = table.Column<int>(type: "integer", nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     LookAfterMe = table.Column<string>(type: "text", nullable: true),
                     AboutMe = table.Column<string>(type: "text", nullable: true),
@@ -233,11 +219,6 @@ namespace Infrastructure.Migrations
                         name: "FK_Products_Category_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Category",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Products_SubCategories_SubCategoryId",
-                        column: x => x.SubCategoryId,
-                        principalTable: "SubCategories",
                         principalColumn: "Id");
                 });
 
@@ -312,11 +293,6 @@ namespace Infrastructure.Migrations
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_SubCategoryId",
-                table: "Products",
-                column: "SubCategoryId");
         }
 
         /// <inheritdoc />
@@ -354,9 +330,6 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Category");
-
-            migrationBuilder.DropTable(
-                name: "SubCategories");
         }
     }
 }
