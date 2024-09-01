@@ -379,20 +379,18 @@ namespace Core.Services
         }
 
         public async Task<IdentityResult> UnblockUser(int userId)
-        {
-            RegisterResultDto registerResultDto = new RegisterResultDto();
-
-            var user = await _userManager.FindByIdAsync(userId.ToString());           
+        { 
+            var user = await _userManager.FindByIdAsync(userId.ToString());
 
             var result = await _userManager.SetLockoutEnabledAsync(user, false);
+           
             if (result.Succeeded)
             {
-                result = await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow - TimeSpan.FromMinutes(1));
             }
 
             return result;
         }
-
         public async Task<List<UserViewDto>> GetAllUsers()
         {
             var users = await _userEntity.GetIQueryable()

@@ -158,7 +158,7 @@ namespace AsosWeb.Controllers
             string userId = User.Claims.ToList()[0].Value.ToString();           
 
             var user = _context.Users
-                .Include(x => x.Address)
+                .Include(x => x.Address)                
                 .Include(x => x.Address.Town)
                 .FirstOrDefault(x => x.Id == int.Parse(userId));
 
@@ -267,9 +267,9 @@ namespace AsosWeb.Controllers
 
 
         [HttpPost("UnBlockUser")]
-        public async Task<IActionResult> UnBlockUser(int userId)
+        public async Task<IActionResult> UnBlockUser([FromBody] BlockUserDto model)
         {
-            return Ok(await _accountService.UnblockUser(userId));
+            return Ok(await _accountService.UnblockUser(model.UserId));
         }
     }
 }

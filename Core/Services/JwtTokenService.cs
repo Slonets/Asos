@@ -26,10 +26,10 @@ namespace Core.Services
         }
 
         public async Task<string> CreateToken(UserTokenInfoDto user)
-        {         
+        {
+            var userDb = await _userManager.FindByIdAsync(user.Id.ToString());
 
-            // Отримуємо ролі користувача
-            var roles = user.Roles;
+            var roles = await _userManager.GetRolesAsync(userDb);            
 
             // Формуємо список клеймів
             List<Claim> claims = new()
@@ -47,10 +47,9 @@ namespace Core.Services
               new Claim("postCode", user.PostCode.ToString()), // Поштовий код як число (перетворене на рядок)
              };
 
-            // Додаємо ролі як окремі клейми
             foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+            {    
+                claims.Add(new Claim("roles", role));
             }
 
             var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<String>("JwtSecretKey")));
