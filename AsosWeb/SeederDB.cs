@@ -57,92 +57,220 @@ namespace AsosWeb
                     {
                         result = userManager.AddToRoleAsync(user, Roles.Admin).Result;
                     }
+
+                    UserEntity user2 = new()
+                    {
+                        FirstName = "Губка",
+                        LastName = "Боб",
+                        Email = "admin2@gmail.com",
+                        UserName = "admin2@gmail.com"
+                    };
+                    var result2 = userManager.CreateAsync(user2, "123456").Result;
+
+                    if (result2.Succeeded)
+                    {
+                        result2 = userManager.AddToRoleAsync(user2, Roles.User).Result;
+                    }
+
+                    UserEntity user3 = new()
+                    {
+                        FirstName = "Міні",
+                        LastName = "піг",
+                        Email = "admin3@gmail.com",
+                        UserName = "admin3@gmail.com"
+                    };
+                    var result3 = userManager.CreateAsync(user3, "123456").Result;
+
+                    if (result3.Succeeded)
+                    {
+                        result3 = userManager.AddToRoleAsync(user3, Roles.User).Result;
+                    }
+
+                    UserEntity user4 = new()
+                    {
+                        FirstName = "Том",
+                        LastName = "і Джері",
+                        Email = "admin4@gmail.com",
+                        UserName = "admin4@gmail.com"
+                    };
+                    var result4 = userManager.CreateAsync(user4, "123456").Result;
+
+                    if (result4.Succeeded)
+                    {
+                        result4 = userManager.AddToRoleAsync(user4, Roles.User).Result;
+                    }
+
+                    UserEntity user5 = new()
+                    {
+                        FirstName = "Том",
+                        LastName = "Редл",
+                        Email = "admin5@gmail.com",
+                        UserName = "admin5@gmail.com"
+                    };
+                    var result5 = userManager.CreateAsync(user5, "123456").Result;
+
+                    if (result5.Succeeded)
+                    {
+                        result5 = userManager.AddToRoleAsync(user5, Roles.User).Result;
+                    }
+
+
+                    UserEntity user6 = new()
+                    {
+                        FirstName = "Альбус",
+                        LastName = "Дамбелдор",
+                        Email = "admin6@gmail.com",
+                        UserName = "admin6@gmail.com"
+                    };
+                    var result6 = userManager.CreateAsync(user6, "123456").Result;
+
+                    if (result6.Succeeded)
+                    {
+                        result6 = userManager.AddToRoleAsync(user6, Roles.User).Result;
+                    }
+
+                    UserEntity user7 = new()
+                    {
+                        FirstName = "Гаррі",
+                        LastName = "Поттер",
+                        Email = "admin7@gmail.com",
+                        UserName = "admin7@gmail.com"
+                    };
+                    var result7 = userManager.CreateAsync(user7, "123456").Result;
+
+                    if (result7.Succeeded)
+                    {
+                        result7 = userManager.AddToRoleAsync(user7, Roles.User).Result;
+                    }
+
+                    UserEntity user8 = new()
+                    {
+                        FirstName = "Герміона",
+                        LastName = "Ґрейнджер",
+                        Email = "admin8@gmail.com",
+                        UserName = "admin8@gmail.com"
+                    };
+                    var result8 = userManager.CreateAsync(user8, "123456").Result;
+
+                    if (result8.Succeeded)
+                    {
+                        result8 = userManager.AddToRoleAsync(user8, Roles.User).Result;
+                    }
+
+                    UserEntity user9 = new()
+                    {
+                        FirstName = "Вейлон",
+                        LastName = "Смізерс",
+                        Email = "admin9@gmail.com",
+                        UserName = "admin9@gmail.com"
+                    };
+                    var result9 = userManager.CreateAsync(user9, "123456").Result;
+
+                    if (result9.Succeeded)
+                    {
+                        result9 = userManager.AddToRoleAsync(user9, Roles.User).Result;
+                    }
+
+                    UserEntity user10 = new()
+                    {
+                        FirstName = "Монтгомері",
+                        LastName = "Бернс",
+                        Email = "admin10@gmail.com",
+                        UserName = "admin10@gmail.com"
+                    };
+                    var result10 = userManager.CreateAsync(user10, "123456").Result;
+
+                    if (result10.Succeeded)
+                    {
+                        result10 = userManager.AddToRoleAsync(user10, Roles.User).Result;
+                    }
                 }
-                #endregion
+            
+            #endregion
 
                 #region Seed Brands, Categories, Subcategories, Products
 
-                if (!context.Brands.Any())
-                {
-                    context.Brands.AddRange(
-                         new BrandEntity { Name = "Nike" },
-                         new BrandEntity { Name = "Adidas" },
-                         new BrandEntity { Name = "Asos" }
-                        );
-                }
-                if (!context.Category.Any())
-                {
-                    context.Category.AddRange(
-                        new CategoryEntity { Id = 1, Name = "Clothing" },
-                        new CategoryEntity { Id = 2, Name = "Sportswear" },
-                        new CategoryEntity { Id = 3, Name = "Accessories" }
-                        );
-                }
-                if (!context.SubCategories.Any())
-                {
-                    context.SubCategories.AddRange(
-                        new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
-                        new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
-                        new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
-                        );
-                }
-                /*  if (!context.Products.Any())
+            if (!context.Brands.Any())
+            {
+                context.Brands.AddRange(
+                     new BrandEntity { Name = "Nike" },
+                     new BrandEntity { Name = "Adidas" },
+                     new BrandEntity { Name = "Asos" }
+                    );
+            }
+            if (!context.Category.Any())
+            {
+                context.Category.AddRange(
+                    new CategoryEntity { Id = 1, Name = "Clothing" },
+                    new CategoryEntity { Id = 2, Name = "Sportswear" },
+                    new CategoryEntity { Id = 3, Name = "Accessories" }
+                    );
+            }
+            if (!context.SubCategories.Any())
+            {
+                context.SubCategories.AddRange(
+                    new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
+                    new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
+                    new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
+                    );
+            }
+            /*  if (!context.Products.Any())
+              {
+                  context.Products.AddRange(
+                  new ProductEntity
                   {
-                      context.Products.AddRange(
-                      new ProductEntity
-                      {
 
-                          Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
-                          Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
-                          Price = 50,
-                          Size = Size.M,
-                          Color = "green",
-                          Gender = Gender.Male,
-                          SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
-                          LookAfterMe = "Machine wash according to instructions on care label",
-                          AboutMe = "Linen: lightweight and strong, Main: 100% Linen."
+                      Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
+                      Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
+                      Price = 50,
+                      Size = Size.M,
+                      Color = "green",
+                      Gender = Gender.Male,
+                      SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
+                      LookAfterMe = "Machine wash according to instructions on care label",
+                      AboutMe = "Linen: lightweight and strong, Main: 100% Linen."
 
-                      },
-                      new ProductEntity
-                      {
+                  },
+                  new ProductEntity
+                  {
 
-                          Name = "adidas Football Entrada 22 joggers in black",
-                          Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
-                          Price = 56,
-                          Size = Size.L,
-                          Color = "black",
-                          Gender = Gender.Male,
-                          SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
-                          LookAfterMe = "Machine wash according to instructions on care label",
-                          AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester."
+                      Name = "adidas Football Entrada 22 joggers in black",
+                      Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
+                      Price = 56,
+                      Size = Size.L,
+                      Color = "black",
+                      Gender = Gender.Male,
+                      SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
+                      LookAfterMe = "Machine wash according to instructions on care label",
+                      AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester."
 
-                      },
-                       new ProductEntity
-                       {
+                  },
+                   new ProductEntity
+                   {
 
-                           Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
-                           Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
-                           Price = 27,
-                           Size = Size.L,
-                           Color = "black",
-                           Gender = Gender.Male,
-                           SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
-                           LookAfterMe = "Wipe clean with a soft dry cloth",
-                           AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel."
+                       Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
+                       Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
+                       Price = 27,
+                       Size = Size.L,
+                       Color = "black",
+                       Gender = Gender.Male,
+                       SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
+                       LookAfterMe = "Wipe clean with a soft dry cloth",
+                       AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel."
 
-                       }
+                   }
 
-                   );*/
-                context.SaveChanges();
+               );*/
+            context.SaveChanges();
 
-                #endregion
+            #endregion
 
                 #region Adrees, Town, Country
 
-                if (!context.Country.Any())
-                {
-                    CountryEntity[] countries = new CountryEntity[]
-                {
+            if (!context.Country.Any())
+            {
+                CountryEntity[] countries = new CountryEntity[]
+            {
                                     new CountryEntity{NameCountry="Україна"},
                                     new CountryEntity{NameCountry="Австралія"},
                                     new CountryEntity{NameCountry="Австрія"},
@@ -337,15 +465,16 @@ namespace AsosWeb
                                     new CountryEntity{NameCountry="Шрі-Ланка"},
                                     new CountryEntity{NameCountry="Ямайка"},
                                     new CountryEntity{NameCountry="Японія"}
-             };
+         };
 
-                    context.Country.AddRange(countries);
-                    context.SaveChanges();
-                }
-                #endregion
+                context.Country.AddRange(countries);
+                context.SaveChanges();
+            }
+            #endregion
 
             }
         }
+    
 
     }
 }
