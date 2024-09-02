@@ -6,6 +6,7 @@ using Core.Helpers;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
+using Infrastructure.Entities.Location;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +23,9 @@ namespace Core.Services
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IRepository<UserEntity> _userEntity;
+        private readonly IRepository<AddressEntity> _addressEntity;
+        private readonly IRepository<TownEntity> _townEntity;
+        private readonly IRepository<CountryEntity> _countryEntity;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ISmtpEmailService _emailService;
@@ -36,7 +40,10 @@ namespace Core.Services
             AsosDbContext context,
             IConfiguration configuration,
             IRepository<UserEntity> userEntity,
-            IFotoAvatar fotoAvatar
+            IFotoAvatar fotoAvatar,
+            IRepository<AddressEntity> addressEntity,
+            IRepository<TownEntity> townEntity,
+            IRepository<CountryEntity> countryEntity
             )
         {
 
@@ -47,14 +54,20 @@ namespace Core.Services
             _context = context;
             _configuration = configuration;
             _userEntity = userEntity;
-            _fotoAvatar = fotoAvatar;           
+            _fotoAvatar = fotoAvatar;
+            _addressEntity=addressEntity;
+            _townEntity = townEntity;
+            _countryEntity = countryEntity;
         }
 
         public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
         {
             Payload payload = await GetPayloadAsync(model.Credential);
-
-            UserEntity? user = await _userManager.FindByEmailAsync(payload.Email);
+            
+            var user = _context.Users
+                .Include(x=>x.Address)
+                .Include(x=>x.Address.Town)
+                .FirstOrDefault(x=>x.Email== payload.Email);            
 
             user ??= await CreateGoogleUserAsync(payload);
 
@@ -162,7 +175,31 @@ namespace Core.Services
                 return loginResultDto;
             }
 
-            var token = await _jwtTokenService.CreateToken(user);
+            var person = _context.Users
+                .Include(x => x.Address)
+                .Include(x => x.Address.Town)
+                .FirstOrDefault(x => x.Id == user.Id);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var userTokenInfo = new UserTokenInfoDto
+            {
+                Id = person.Id,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Email = person.Email,
+                Birthday = person.Birthday?.ToString("dd-MM-yyyy"),
+                Image = person.Image,
+                PhoneNumber = person.PhoneNumber,
+                Country = person.Address?.Town.CountryId,
+                Town = person.Address?.Town.NameTown,
+                Address = person.Address?.Street,
+                PostCode = person.PostCode,
+                Roles = roles.ToList(),
+            };
+
+
+            var token = await _jwtTokenService.CreateToken(userTokenInfo);
             loginResultDto.Token = token;
             loginResultDto.IsSuccess=true;
 
@@ -231,13 +268,12 @@ namespace Core.Services
             }
         }
 
-        public async Task<UserEntity> GetUserById(int id)
-        {         
+        public async Task<UserEntity> GetUser(string id)
+        {     
 
-            var user = await _userEntity.GetByIDAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             
-            return user;       
-                               
+            return user;                                  
         }
 
         // Асинхронний метод для зміни даних користувача
@@ -251,27 +287,70 @@ namespace Core.Services
             // Синхронні операції зміни даних
             user.FirstName = editUserDto.FirstName;
             user.LastName = editUserDto.LastName;
-            user.PhoneNumber = editUserDto.PhoneNumber;
             user.Email = editUserDto.Email;
-
-            // Преобразование даты в UTC перед сохранением
-            if (editUserDto.Birthday.HasValue)
-            {
-                user.Birthday = DateTime.SpecifyKind(editUserDto.Birthday.Value, DateTimeKind.Utc);
-            }
-            else
-            {
-                user.Birthday = null;
-            }
-
 
             if (editUserDto.Image != null)
             {
                 user.Image = editUserDto.Image;
             }
 
+            // Перетворення дати народження в UTC перед збереженням
+            if (!string.IsNullOrEmpty(editUserDto.Birthday))
+            {
+                DateTime localDateTime = DateTime.Parse(editUserDto.Birthday);
+                DateTime utcDateTime = localDateTime.ToUniversalTime();
+                user.Birthday = utcDateTime;
+            }
+
             await _userManager.UpdateAsync(user);
-           
+
+        }
+
+        public async Task EditAdrressUserAsync(EditAdrressUserDto editAdrressDto)
+        {
+
+            string id = (editAdrressDto.Id).ToString();
+
+            var user = await _userManager.FindByIdAsync(id);
+
+            // Синхронні операції зміни даних
+            user.FirstName = editAdrressDto.FirstName;
+            user.LastName = editAdrressDto.LastName;
+            user.PhoneNumber = editAdrressDto.PhoneNumber;
+            user.PostCode = editAdrressDto.PostCode;
+
+            TownEntity townEntity=null;            
+
+            if (editAdrressDto.Town!=null)
+            {
+                townEntity = new TownEntity
+                {
+                    NameTown = editAdrressDto.Town,
+                    CountryId = editAdrressDto.Country,
+                };
+
+                await _townEntity.InsertAsync(townEntity);
+
+                // Перевірте, чи потрібен параметр у цьому методі
+                await _context.SaveChangesAsync();
+            }          
+
+            if(editAdrressDto.Address != null)
+            {
+                var addressEntity = new AddressEntity
+                {
+                    Street = editAdrressDto.Address,
+                    TownId = townEntity.Id
+                };
+
+                await _addressEntity.InsertAsync(addressEntity);
+
+                await _context.SaveChangesAsync();
+
+                user.AddressId = addressEntity.Id;               
+            }
+            
+            await _userManager.UpdateAsync(user);
         }
 
         // Асинхронний метод для зміни пароля користувача
@@ -300,20 +379,18 @@ namespace Core.Services
         }
 
         public async Task<IdentityResult> UnblockUser(int userId)
-        {
-            RegisterResultDto registerResultDto = new RegisterResultDto();
-
-            var user = await _userManager.FindByIdAsync(userId.ToString());           
+        { 
+            var user = await _userManager.FindByIdAsync(userId.ToString());
 
             var result = await _userManager.SetLockoutEnabledAsync(user, false);
+           
             if (result.Succeeded)
             {
-                result = await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow - TimeSpan.FromMinutes(1));
             }
 
             return result;
         }
-
         public async Task<List<UserViewDto>> GetAllUsers()
         {
             var users = await _userEntity.GetIQueryable()

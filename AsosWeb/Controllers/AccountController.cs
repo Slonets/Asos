@@ -18,6 +18,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Core.Exceptions;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Interfaces;
+using Core.Constants;
+using System.Diagnostics.Metrics;
+using Infrastructure.Data;
 
 
 namespace AsosWeb.Controllers
@@ -31,13 +35,17 @@ namespace AsosWeb.Controllers
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         UserManager<UserEntity> _userManager;
+        private readonly IRepository<UserEntity> _userEntity;
+        private readonly AsosDbContext _context;
 
-        public AccountController(IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService, UserManager<UserEntity> userManager)
+        public AccountController(AsosDbContext context ,IRepository<UserEntity> userEntity, IAccountService accountService, IMapper mapper, IJwtTokenService jwtTokenService, UserManager<UserEntity> userManager)
         {
             _accountService = accountService;
             _mapper = mapper;
             _jwtTokenService = jwtTokenService;
             _userManager=userManager;
+            _userEntity = userEntity;
+            _context=context;
         }
 
         [AllowAnonymous]
@@ -104,10 +112,33 @@ namespace AsosWeb.Controllers
             {
                 UserEntity user = await _accountService.GoogleSignInAsync(model);
 
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Створюємо DTO для токена
+                var userTokenInfo = new UserTokenInfoDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
+                    Image = user.Image,
+                    PhoneNumber = user.PhoneNumber,
+                    Country = user.Address?.Town.CountryId,
+                    Town = user.Address?.Town.NameTown,
+                    Address = user.Address?.Street,
+                    PostCode = user.PostCode,
+                    Roles = roles.ToList()
+                };
+
+                // Створюємо токен на основі DTO
+                var token = await _jwtTokenService.CreateToken(userTokenInfo);
+
+
                 return Ok(new JwtTokenResponseDto
                 {
-                    Token = await _jwtTokenService.CreateToken(user)
-                });
+                    Token = token
+                }) ;
             }
             catch (InvalidJwtException e)
             {
@@ -122,16 +153,72 @@ namespace AsosWeb.Controllers
         [HttpPut("edit-user")]
         public async Task<IActionResult> EditUser([FromForm] EditUserDto editUserDto)
         {
-
             await _accountService.EditUserAsync(editUserDto);
 
-            string id = User.Claims.ToList()[0].Value.ToString();
+            string userId = User.Claims.ToList()[0].Value.ToString();           
 
-            var user = _userManager.FindByIdAsync(id).Result;
+            var user = _context.Users
+                .Include(x => x.Address)                
+                .Include(x => x.Address.Town)
+                .FirstOrDefault(x => x.Id == int.Parse(userId));
 
-            var token = await _jwtTokenService.CreateToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var userTokenInfo = new UserTokenInfoDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
+                Image = user.Image,
+                PhoneNumber = user.PhoneNumber,
+                Country = user.Address?.Town.CountryId,
+                Town = user.Address?.Town.NameTown,
+                Address = user.Address?.Street,
+                PostCode = user.PostCode,
+                Roles = roles.ToList(),
+            };
+
+            var token = await _jwtTokenService.CreateToken(userTokenInfo);
 
             return Ok(new {token});            
+        }
+
+        [HttpPut("edit-adrress")]
+        public async Task<IActionResult> EditAdrressUser([FromForm] EditAdrressUserDto editDto)
+        {
+            await _accountService.EditAdrressUserAsync(editDto);
+
+            string userId = User.Claims.ToList()[0].Value.ToString();
+
+            var user = _context.Users
+              .Include(x => x.Address)
+              .Include(x => x.Address.Town)
+              .FirstOrDefault(x => x.Id == int.Parse(userId));
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var userTokenInfo = new UserTokenInfoDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
+                    Image = user.Image,
+                    PhoneNumber = user.PhoneNumber,
+                    Country = user.Address?.Town.CountryId,
+                    Town = user.Address.Town.NameTown,
+                    Address = user.Address?.Street,
+                    PostCode = user.PostCode,
+                    Roles = roles.ToList(),
+                };
+
+                var token = await _jwtTokenService.CreateToken(userTokenInfo);
+
+                return Ok(new { token });
+                        
         }
 
         [Authorize]
@@ -167,11 +254,22 @@ namespace AsosWeb.Controllers
             return Ok(await _accountService.BlockUser(model.UserId));
         }
 
+        [Authorize]
+        [HttpGet("UserById")]
+        public async Task<IActionResult> GetUser()
+        {
+            string id = User.Claims.ToList()[0].Value.ToString();
+
+            var user = await _accountService.GetUser(id);            
+
+            return Ok(user);
+        }
+
 
         [HttpPost("UnBlockUser")]
-        public async Task<IActionResult> UnBlockUser(int userId)
+        public async Task<IActionResult> UnBlockUser([FromBody] BlockUserDto model)
         {
-            return Ok(await _accountService.UnblockUser(userId));
+            return Ok(await _accountService.UnblockUser(model.UserId));
         }
     }
 }
