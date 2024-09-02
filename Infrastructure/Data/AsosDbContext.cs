@@ -12,9 +12,10 @@ namespace Infrastructure.Data
     {
         public DbSet<BrandEntity> Brands { get; set; }
         public DbSet<CategoryEntity> Category { get; set; }
-        public DbSet<SubCategoryEntity> SubCategories { get; set; }
         public DbSet<ProductEntity> Products { get; set; }
         public DbSet<ProductImageEntity> ProductImages { get; set; }
+        public DbSet<OrderEntity> Orders { get; set; }
+        public DbSet<OrderProductEntity> OrderProducts { get; set; }
         public AsosDbContext(DbContextOptions<AsosDbContext> options)
         : base(options) { }
 
@@ -33,34 +34,6 @@ namespace Infrastructure.Data
                     .HasForeignKey(u => u.UserId)
                     .IsRequired();
             });
-
-            builder.Entity<BrandEntity>()
-                .HasMany(b => b.Products)
-                .WithOne(p => p.Brand)
-                .HasForeignKey(p => p.BrandId);
-
-            builder.Entity<CategoryEntity>()
-                .HasMany(c=>c.SubCategories)
-                .WithOne(s=>s.Category)
-                .HasForeignKey(s=>s.CategoryId);
-
-            builder.Entity<CategoryEntity>()
-                .HasMany(c=>c.Products)
-                .WithOne(p => p.Category)
-                .HasForeignKey(p=>p.CategoryId);
-
-           /* builder.Entity<SubCategoryEntity>()
-                .HasMany(s => s.Products)
-                .WithOne(p => p.SubCategory)
-                .HasForeignKey(p => p.SubCategoryId);*/
-
-            builder.Entity<ProductEntity>()
-                .HasMany(p=>p.productImages)
-                .WithOne(pi=>pi.Product)
-                .HasForeignKey(pi=>pi.ProductId);
-
-            
-
         }
     }
 }

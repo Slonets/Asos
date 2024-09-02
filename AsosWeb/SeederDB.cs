@@ -54,36 +54,24 @@ namespace AsosWeb
                     {
                         result = userManager.AddToRoleAsync(user, Roles.Admin).Result;
                     }
-                    #endregion
-
                 }
-                #region Seed Brands, Categories, Subcategories, Products
+                #endregion
+
+
+                #region Seed Brands, Categories, Products
                 if (!context.Brands.Any())
                 {
-                    context.Brands.AddRange(
-                         new BrandEntity { Name = "Nike" },
-                         new BrandEntity { Name = "Adidas" },
-                         new BrandEntity { Name = "Asos" }
-                        );
-                }
-                if (!context.Category.Any())
-                {
-                    context.Category.AddRange(
-                        new CategoryEntity { Id = 1, Name = "Clothing" },
-                        new CategoryEntity { Id = 2, Name = "Sportswear" },
-                        new CategoryEntity { Id = 3, Name = "Accessories" }
-                        );
-                }
-                if (!context.SubCategories.Any())
-                {
-                    context.SubCategories.AddRange(
-                        new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
-                        new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
-                        new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
-                        );
-                }
-              /*  if (!context.Products.Any())
-                {
+                    var nike = new BrandEntity { Name = "Nike" };
+                    var adidas = new BrandEntity { Name = "Adidas" };
+                    var asos = new BrandEntity { Name = "Asos" };
+                    context.Brands.AddRange([nike, adidas, asos]);
+
+                    var clothing = new CategoryEntity { Name = "Clothing" };
+                    var sportswear = new CategoryEntity { Name = "Sportswear" };
+                    var accessories = new CategoryEntity { Name = "Accessories" };
+
+                    context.Category.AddRange([clothing, sportswear, accessories]);
+
                     context.Products.AddRange(
                     new ProductEntity
                     {
@@ -94,9 +82,13 @@ namespace AsosWeb
                         Size = Size.M,
                         Color = "green",
                         Gender = Gender.Male,
+                        Brand = nike,
+                        Category = sportswear,
                         SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
                         LookAfterMe = "Machine wash according to instructions on care label",
-                        AboutMe = "Linen: lightweight and strong, Main: 100% Linen."
+                        AboutMe = "Linen: lightweight and strong, Main: 100% Linen.",
+
+
 
                     },
                     new ProductEntity
@@ -108,9 +100,12 @@ namespace AsosWeb
                         Size = Size.L,
                         Color = "black",
                         Gender = Gender.Male,
+                        Brand = adidas,
+                        Category = accessories,
                         SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
                         LookAfterMe = "Machine wash according to instructions on care label",
-                        AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester."
+                        AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester.",
+
 
                     },
                      new ProductEntity
@@ -122,22 +117,27 @@ namespace AsosWeb
                          Size = Size.L,
                          Color = "black",
                          Gender = Gender.Male,
+                         Brand = asos,
+                         Category = clothing,
                          SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
                          LookAfterMe = "Wipe clean with a soft dry cloth",
-                         AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel."
+                         AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel.",
+
 
                      }
 
-                 );*/
+                 );
+                    
                     context.SaveChanges();
+
                 }
                 #endregion
             }
 
         }
-
-
-
     }
+
+
+}
 
 
