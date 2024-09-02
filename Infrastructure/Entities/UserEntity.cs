@@ -1,5 +1,4 @@
-﻿using Infrastructure.Entities.Location;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,5 +23,6 @@ namespace Infrastructure.Entities
         public AddressEntity Address { get; set; }
         public int? PostCode { get; set; }
         public virtual ICollection<UserRoleEntity> UserRoles { get; set; }
+        public virtual ICollection<OrderEntity> Orders { get; set; }
     }
 }

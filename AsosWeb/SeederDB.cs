@@ -185,92 +185,82 @@ namespace AsosWeb
                         result10 = userManager.AddToRoleAsync(user10, Roles.User).Result;
                     }
                 }
-            
-            #endregion
+                #endregion
 
-                #region Seed Brands, Categories, Subcategories, Products
 
-            if (!context.Brands.Any())
-            {
-                context.Brands.AddRange(
-                     new BrandEntity { Name = "Nike" },
-                     new BrandEntity { Name = "Adidas" },
-                     new BrandEntity { Name = "Asos" }
-                    );
-            }
-            if (!context.Category.Any())
-            {
-                context.Category.AddRange(
-                    new CategoryEntity { Id = 1, Name = "Clothing" },
-                    new CategoryEntity { Id = 2, Name = "Sportswear" },
-                    new CategoryEntity { Id = 3, Name = "Accessories" }
-                    );
-            }
-            if (!context.SubCategories.Any())
-            {
-                context.SubCategories.AddRange(
-                    new SubCategoryEntity { Name = "Shirts", CategoryId = 1 },
-                    new SubCategoryEntity { Name = "Joggers", CategoryId = 2 },
-                    new SubCategoryEntity { Name = "Rings", CategoryId = 3 }
-                    );
-            }
-            /*  if (!context.Products.Any())
-              {
-                  context.Products.AddRange(
-                  new ProductEntity
-                  {
+                #region Seed Brands, Categories, Products
+                if (!context.Brands.Any())
+                {
+                    var nike = new BrandEntity { Name = "Nike" };
+                    var adidas = new BrandEntity { Name = "Adidas" };
+                    var asos = new BrandEntity { Name = "Asos" };
+                    context.Brands.AddRange([nike, adidas, asos]);
 
-                      Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
-                      Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
-                      Price = 50,
-                      Size = Size.M,
-                      Color = "green",
-                      Gender = Gender.Male,
-                      SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
-                      LookAfterMe = "Machine wash according to instructions on care label",
-                      AboutMe = "Linen: lightweight and strong, Main: 100% Linen."
+                    var clothing = new CategoryEntity { Name = "Clothing" };
+                    var sportswear = new CategoryEntity { Name = "Sportswear" };
+                    var accessories = new CategoryEntity { Name = "Accessories" };
+
+                    context.Category.AddRange([clothing, sportswear, accessories]);
+
+                    context.Products.AddRange(
+                    new ProductEntity
+                    {
+
+                        Name = "Tommy Hilfiger pigment dyed solid regular fit shirt",
+                        Description = "A basic, but make it elevated, Button-down collar, Button placket, Logo embroidery to chest, Regular fit",
+                        Price = 50,
+                        Size = Size.M,
+                        Color = "green",
+                        Gender = Gender.Male,
+                        Brand = nike,
+                        Category = sportswear,
+                        SizeAndFit = "Model's height: 188cm / 6' 2'', Model is wearing: M - 50",
+                        LookAfterMe = "Machine wash according to instructions on care label",
+                        AboutMe = "Linen: lightweight and strong, Main: 100% Linen.",
+
+
 
                   },
                   new ProductEntity
                   {
 
-                      Name = "adidas Football Entrada 22 joggers in black",
-                      Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
-                      Price = 56,
-                      Size = Size.L,
-                      Color = "black",
-                      Gender = Gender.Male,
-                      SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
-                      LookAfterMe = "Machine wash according to instructions on care label",
-                      AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester."
+                        Name = "adidas Football Entrada 22 joggers in black",
+                        Description = "Win on and off the pitch, Inner drawcord waistband, Mid rise, Side pockets, adidas logo embroidery to thigh, Zip cuffs for easy changing over trainers ,Regular, tapered fit",
+                        Price = 56,
+                        Size = Size.L,
+                        Color = "black",
+                        Gender = Gender.Male,
+                        Brand = adidas,
+                        Category = accessories,
+                        SizeAndFit = "Model's height: 185cm/6'1, Model is wearing: Medium",
+                        LookAfterMe = "Machine wash according to instructions on care label",
+                        AboutMe = "Sweatshirt fabric: soft and warm, Main: 100% Polyester.",
+
 
                   },
                    new ProductEntity
                    {
 
-                       Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
-                       Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
-                       Price = 27,
-                       Size = Size.L,
-                       Color = "black",
-                       Gender = Gender.Male,
-                       SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
-                       LookAfterMe = "Wipe clean with a soft dry cloth",
-                       AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel."
+                         Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
+                         Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
+                         Price = 27,
+                         Size = Size.L,
+                         Color = "black",
+                         Gender = Gender.Male,
+                         Brand = asos,
+                         Category = clothing,
+                         SizeAndFit = "ICYDK your ring size: wrap a strip of paper tightly around your finger, marking where the paper meets. Then measure the length (in mm) between the mark and the end – find your closest size in the drop down.",
+                         LookAfterMe = "Wipe clean with a soft dry cloth",
+                         AboutMe = "Corrosion-resistant, non-tarnish stainless steel: gold plating, Main: 100% Steel.",
+
 
                    }
 
-               );*/
-            context.SaveChanges();
-
-            #endregion
-
-                #region Adrees, Town, Country
-
-            if (!context.Country.Any())
-            {
-                CountryEntity[] countries = new CountryEntity[]
-            {
+                 );
+                    if (!context.Country.Any())
+                    {
+                        CountryEntity[] countries = new CountryEntity[]
+                    {
                                     new CountryEntity{NameCountry="Україна"},
                                     new CountryEntity{NameCountry="Австралія"},
                                     new CountryEntity{NameCountry="Австрія"},
@@ -465,18 +455,20 @@ namespace AsosWeb
                                     new CountryEntity{NameCountry="Шрі-Ланка"},
                                     new CountryEntity{NameCountry="Ямайка"},
                                     new CountryEntity{NameCountry="Японія"}
-         };
+                 };
 
-                context.Country.AddRange(countries);
-                context.SaveChanges();
-            }
-            #endregion
+                        context.Country.AddRange(countries);
+                        context.SaveChanges();
+                    }
+                    context.SaveChanges();
 
+                }
+                #endregion
             }
         }
-    
-
     }
+
+
 }
 
 

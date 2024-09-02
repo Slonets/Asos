@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Entities.Site
 {
-    public class SubCategoryEntity
+    [Table("tblOrderStatuses")]
+    public class OrderStatusEntity
     {
+        [Key]
         public int Id { get; set; }
-        [Required]
+        [Required, StringLength(255)]
         public string Name { get; set; }
-        public int? CategoryId { get; set; }
-        public CategoryEntity Category { get; set; }
-        public ICollection<ProductEntity> Products { get; set; }
+        public virtual ICollection<OrderEntity> Orders { get; set; }
     }
 }
