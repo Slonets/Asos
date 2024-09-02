@@ -8,14 +8,13 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Entities.Site
 {
-    [Table("tblCategories")]
-    public class CategoryEntity
+    [Table("tblOrderStatuses")]
+    public class OrderStatusEntity
     {
         [Key]
         public int Id { get; set; }
-        [Required, StringLength(200)]
+        [Required, StringLength(255)]
         public string Name { get; set; }
-        public ICollection<ProductEntity> Products { get; set; }
-
+        public virtual ICollection<OrderEntity> Orders { get; set; }
     }
 }

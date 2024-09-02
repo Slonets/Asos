@@ -69,7 +69,7 @@ namespace Core.Services
 
                     imgList.Add(img);
                 }
-                product.productImages = imgList;
+                product.ProductImages = imgList;
                 _context.ProductImages.AddRange(imgList);
                 await _context.SaveChangesAsync();
 
