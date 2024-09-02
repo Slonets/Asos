@@ -13,7 +13,7 @@ namespace Infrastructure.Entities.Location
         [Key]
         public int Id { get; set; }
         public string NameTown { get; set; }
-        [ForeignKey("CountryEntity")]
+        [ForeignKey("Country")]
         public int CountryId { get; set; }
         public CountryEntity Country { get; set; }
     }

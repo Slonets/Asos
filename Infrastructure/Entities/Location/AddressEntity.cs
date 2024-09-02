@@ -12,7 +12,7 @@ namespace Infrastructure.Entities.Location
         public int Id { get; set; }
         public string? Street { get; set; }
 
-        [ForeignKey("TownEntity")]
+        [ForeignKey("Town")]
         public int TownId { get; set; }
         public TownEntity Town { get; set; }
     }
