@@ -14,6 +14,7 @@ namespace Core.Interfaces
         Task Create(CreateProductDto model);
         Task Delete(int id);
         Task<CreateProductDto> Get(int id);
+        Task<List<CreateProductDto>> GettAll();
         List<object> GettAllSizes();
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();

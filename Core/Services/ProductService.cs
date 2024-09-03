@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.DTO.Site.Category;
 using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -103,6 +104,12 @@ namespace Core.Services
             if (product == null) return null; // exception handling
 
             return _mapper.Map<CreateProductDto>(product);
+        }
+
+        public async Task<List<CreateProductDto>> GettAll()
+        {
+            var result = await _context.Products.ToListAsync();
+            return _mapper.Map<List<CreateProductDto>>(result);
         }
 
         public List<object> GettAllGenders()

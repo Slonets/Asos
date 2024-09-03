@@ -45,5 +45,10 @@ namespace AsosWeb.Controllers
         {
             return Ok(await _productService.GettAllGendersAsync());
         }
+        [HttpGet("GetAllProducts")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            return Ok(await _productService.GettAll());
+        }
     }
 }
