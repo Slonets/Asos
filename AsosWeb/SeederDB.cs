@@ -249,7 +249,7 @@ namespace AsosWeb
                    new ProductEntity
                    {
 
-                         Name = "ASOS DESIGN waterproof stainless steel band ring with greek wave edge in gold tone",
+                         Name = "ASOS DESIGN waterproof ",
                          Description = "Accessorising is the best part, Greek wave design, Slim band, Smooth finish, You can shower, swim and work out with me",
                          Price = 27,
                          Size = Size.L,
