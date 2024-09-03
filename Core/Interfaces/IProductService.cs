@@ -12,8 +12,9 @@ namespace Core.Interfaces
     public interface IProductService
     {
         Task Create(CreateProductDto model);
-        Task Delete(int id);
+        Task<bool> Delete(int id);
         Task<CreateProductDto> Get(int id);
+        Task<List<GetAllProductDto>> GettAll();
         List<object> GettAllSizes();
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();

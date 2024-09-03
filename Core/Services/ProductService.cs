@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.DTO.Site.Category;
 using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -83,15 +84,17 @@ namespace Core.Services
 
 
 
-        public async Task Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-           var currentPost = await Get(id);
-
-            if (currentPost != null) 
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
             {
-                return;
+                return false; // Товар не знайдено
             }
-            ////
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return true; // Видалення успішне
         }
 
         public async Task<CreateProductDto> Get(int id)
@@ -103,6 +106,12 @@ namespace Core.Services
             if (product == null) return null; // exception handling
 
             return _mapper.Map<CreateProductDto>(product);
+        }
+
+        public async Task<List<GetAllProductDto>> GettAll()
+        {
+            var result = await _context.Products.ToListAsync();
+            return _mapper.Map<List<GetAllProductDto>>(result);
         }
 
         public List<object> GettAllGenders()
@@ -144,6 +153,6 @@ namespace Core.Services
             return await Task.FromResult(GettAllSizes());
         }
 
-       
+        
     }
 }

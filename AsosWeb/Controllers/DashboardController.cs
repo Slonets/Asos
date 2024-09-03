@@ -1,4 +1,5 @@
-﻿using Core.DTO.Site.Product;
+﻿using Core.DTO.Site.Category;
+using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Core.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,12 @@ namespace AsosWeb.Controllers
             await _productService.Create(model);
             return Ok(model);
         }
+        [HttpPost("CreateCategory")]
+        public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryDto model)
+        {
+            await _categoryService.Create(model);
+            return Ok(model);
+        }
         [HttpGet("GetAllCategory")]
         public async Task<IActionResult> GetAllCategory()
         {
@@ -44,6 +51,31 @@ namespace AsosWeb.Controllers
         public async Task<IActionResult> GetAllGenders()
         {
             return Ok(await _productService.GettAllGendersAsync());
+        }
+        [HttpGet("GetAllProducts")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            return Ok(await _productService.GettAll());
+        }
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var result = await _productService.Delete(id);
+            if (result)
+            {
+                return Ok();
+            }
+            return NotFound(); 
+        }
+        [HttpDelete("DeleteCategory/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var result = await _categoryService.Delete(id);
+            if (result)
+            {
+                return Ok();
+            }
+            return NotFound();
         }
     }
 }

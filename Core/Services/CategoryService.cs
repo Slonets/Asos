@@ -2,6 +2,7 @@
 using Core.DTO.Site.Category;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Entities.Site;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,28 @@ namespace Core.Services
             _context = context;
             _mapper = mapper;
         }
+
+        public async Task Create(CreateCategoryDto model)
+        {
+            var category = _mapper.Map<CategoryEntity>(model);
+
+            _context.Category.Add(category);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var category = await _context.Category.FindAsync(id);
+            if (category == null)
+            {
+                return false;
+            }
+
+            _context.Category.Remove(category);
+            await _context.SaveChangesAsync();
+            return true; 
+        }
+
         public async Task<List<CategoryDto>> GettAll()
         {
             
