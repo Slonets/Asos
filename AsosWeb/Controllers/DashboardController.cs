@@ -67,5 +67,15 @@ namespace AsosWeb.Controllers
             }
             return NotFound(); 
         }
+        [HttpDelete("DeleteCategory/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var result = await _categoryService.Delete(id);
+            if (result)
+            {
+                return Ok();
+            }
+            return NotFound();
+        }
     }
 }

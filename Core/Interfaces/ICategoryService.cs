@@ -12,5 +12,6 @@ namespace Core.Interfaces
     {
         Task<List<CategoryDto>> GettAll();
         Task Create(CreateCategoryDto model);
+        Task<bool> Delete(int id);
     }
 }
