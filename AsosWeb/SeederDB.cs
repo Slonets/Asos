@@ -194,13 +194,21 @@ namespace AsosWeb
                     var nike = new BrandEntity { Name = "Nike" };
                     var adidas = new BrandEntity { Name = "Adidas" };
                     var asos = new BrandEntity { Name = "Asos" };
-                    context.Brands.AddRange([nike, adidas, asos]);
+                    var gucci = new BrandEntity { Name = "Gucci" };
+                    var prada = new BrandEntity { Name = "Prada" };
+                    var chanel = new BrandEntity { Name = "Chanel" };
+                    var burberry = new BrandEntity { Name = "Burberry " };
+                    context.Brands.AddRange([nike, adidas, asos, gucci, prada, chanel, burberry]);
 
                     var clothing = new CategoryEntity { Name = "Clothing" };
                     var sportswear = new CategoryEntity { Name = "Sportswear" };
                     var accessories = new CategoryEntity { Name = "Accessories" };
+                    var makeup = new CategoryEntity { Name = "Make Up" };
+                    var skincare = new CategoryEntity { Name = "Skin Care" };
+                    var haircare = new CategoryEntity { Name = "Hair Care" };
+                    var perfume = new CategoryEntity { Name = "Perfume" };
 
-                    context.Category.AddRange([clothing, sportswear, accessories]);
+                    context.Category.AddRange([clothing, sportswear, accessories, makeup, skincare, haircare, perfume]);
 
                     context.Products.AddRange(
                     new ProductEntity
