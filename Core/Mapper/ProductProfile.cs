@@ -14,6 +14,7 @@ namespace Core.Mapper
         public ProductProfile() 
         {
             CreateMap<CreateProductDto,ProductEntity>().ReverseMap();
+            CreateMap<GetAllProductDto,ProductEntity>().ReverseMap();
         }
     }
 }
