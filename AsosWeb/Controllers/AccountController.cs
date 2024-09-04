@@ -77,7 +77,6 @@ namespace AsosWeb.Controllers
             }
         }
 
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {

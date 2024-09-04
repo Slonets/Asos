@@ -36,7 +36,7 @@ namespace AsosWeb.Controllers
         [HttpPost("CreateAvatar")]
         public async Task<IActionResult> CreateAvatar([FromForm] UpdateImageModel model)
         {
-            var result = await _image.SaveFoto(model.Image);
+            var result = await _image.SaveFotoAvatar(model.Image);
             return Ok(result);
         }
 
