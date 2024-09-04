@@ -60,10 +60,12 @@ namespace Core.Services
             _countryEntity = countryEntity;
         }
 
-        public async Task<UserEntity> GoogleSignInAsync(GoogleSignInDto model)
+        public async Task<LoginResultDto> GoogleSignInAsync(GoogleSignInDto model)
         {
             Payload payload = await GetPayloadAsync(model.Credential);
-            
+
+            LoginResultDto loginResultDto = new LoginResultDto();
+
             var user = _context.Users
                 .Include(x=>x.Address)
                 .Include(x=>x.Address.Town)
@@ -71,7 +73,42 @@ namespace Core.Services
 
             user ??= await CreateGoogleUserAsync(payload);
 
-            return user;
+            if (user.LockoutEnabled == true)
+            {
+                loginResultDto.IsSuccess = false;
+
+                string lockoutDate = user.LockoutEnd.Value.ToString("MM/dd/yyyy");
+
+                loginResultDto.Error = $"User {user.FirstName} {user.LastName} LOCKED to {lockoutDate}";
+                return loginResultDto;
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Створюємо DTO для токена
+            var userTokenInfo = new UserTokenInfoDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
+                Image = user.Image,
+                PhoneNumber = user.PhoneNumber,
+                Country = user.Address?.Town.CountryId,
+                Town = user.Address?.Town.NameTown,
+                Address = user.Address?.Street,
+                PostCode = user.PostCode,
+                Roles = roles.ToList()
+            };
+
+            // Створюємо токен на основі DTO
+            var token = await _jwtTokenService.CreateToken(userTokenInfo);
+
+            loginResultDto.Token = token;
+            loginResultDto.IsSuccess = true;
+
+            return loginResultDto;
         }
 
         private async Task<Payload> GetPayloadAsync(string credential)
@@ -100,7 +137,11 @@ namespace Core.Services
 
             try
             {
-                await CreateUserAsync(user);
+                 await CreateUserAsync(user);
+                               
+                  // Використовуйте властивості з об'єкта user замість dto
+                  _emailService.SuccessfulLogin(user.FirstName + " " + user.LastName, user.Email);               
+
             }
             catch
             {
@@ -171,7 +212,8 @@ namespace Core.Services
             if(user.LockoutEnabled==true) 
             {
                 loginResultDto.IsSuccess = false;
-                loginResultDto.Error = $"User {user.FirstName} {user.LastName} locked to {user.LockoutEnd.Value} years";
+                string lockoutDate = user.LockoutEnd.Value.ToString("MM/dd/yyyy");
+                loginResultDto.Error = $"User {user.FirstName} {user.LastName} LOCKED to {lockoutDate}";
                 return loginResultDto;
             }
 
