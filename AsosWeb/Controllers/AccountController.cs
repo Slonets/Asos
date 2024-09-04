@@ -107,47 +107,19 @@ namespace AsosWeb.Controllers
 
         [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
-        {
-            try
-            {
-                UserEntity user = await _accountService.GoogleSignInAsync(model);
+        {           
 
-                var roles = await _userManager.GetRolesAsync(user);
+                var result = await _accountService.GoogleSignInAsync(model);
 
-                // Створюємо DTO для токена
-                var userTokenInfo = new UserTokenInfoDto
+                if (result.IsSuccess)
                 {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
-                    Image = user.Image,
-                    PhoneNumber = user.PhoneNumber,
-                    Country = user.Address?.Town.CountryId,
-                    Town = user.Address?.Town.NameTown,
-                    Address = user.Address?.Street,
-                    PostCode = user.PostCode,
-                    Roles = roles.ToList()
-                };
 
-                // Створюємо токен на основі DTO
-                var token = await _jwtTokenService.CreateToken(userTokenInfo);
-
-
-                return Ok(new JwtTokenResponseDto
+                    return Ok(new { token = result.Token });
+                }
+                else
                 {
-                    Token = token
-                }) ;
-            }
-            catch (InvalidJwtException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (IdentityException e)
-            {
-                return StatusCode(500, e.IdentityResult.Errors);
-            }
+                    return BadRequest(result);
+                }                
         }
 
         [HttpPut("edit-user")]
