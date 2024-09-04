@@ -9,7 +9,8 @@ namespace Core.Interfaces
 {
     public interface IFotoAvatar
     {
-        Task<string> SaveFoto(IFormFile? file);
+        Task<string> SaveFotoAvatar(IFormFile? file);
         Task<string> UpdateFoto(IFormFile? file, string existingFileName);
+        Task<string> SaveFotoProduct(string url);
     }
 }

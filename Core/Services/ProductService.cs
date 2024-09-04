@@ -44,7 +44,7 @@ namespace Core.Services
                 {
                     throw new InvalidOperationException("Web root path is not set.");
                 }
-                string upload = Path.Combine(webRootPath, "img");
+                string upload = Path.Combine(webRootPath, "product");
 
                 if (!Directory.Exists(upload))
                 {
