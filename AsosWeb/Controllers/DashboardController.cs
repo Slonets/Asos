@@ -77,5 +77,23 @@ namespace AsosWeb.Controllers
             }
             return NotFound();
         }
+        [HttpPut("UpdateCategory/{id}")]
+        public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromForm] UpdateProductDto model)
+        {
+            try
+            {
+                model.Id = id;  
+                await _productService.Update(model);
+                return Ok(new { message = "Product updated successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the product", error = ex.Message });
+            }
+        }
     }
 }

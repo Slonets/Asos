@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.DTO.Authentication;
 using Core.DTO.Site.Category;
 using Core.DTO.Site.Product;
 using Core.Interfaces;
@@ -6,6 +7,7 @@ using Infrastructure.Data;
 using Infrastructure.Entities.Enums;
 using Infrastructure.Entities.Site;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -153,6 +155,61 @@ namespace Core.Services
             return await Task.FromResult(GettAllSizes());
         }
 
-        
+        public async Task Update(UpdateProductDto model)
+        {
+            int id = model.Id;
+
+            var product = await _context.Products.FindAsync(id);
+
+
+            if (product == null)
+            {
+                throw new ArgumentException("Product not found");
+            }
+
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.Size = model.Size;
+            product.Color = model.Color;
+            product.BrandId = model.BrandId;
+            product.CategoryId = model.CategoryId;
+            product.Gender= model.Gender;
+            product.LookAfterMe = model.LookAfterMe;
+            product.AboutMe = model.AboutMe;
+            product.SizeAndFit = model.SizeAndFit;
+            product.Amount = model.Amount;
+
+            if (model.ImageUrls != null)
+            {
+                var productImages = new List<ProductImageEntity>();
+                foreach (var file in model.ImageUrls)
+                {
+
+                    var filePath = Path.Combine("wwwroot", "img", file.FileName);
+
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+
+                    var productImage = new ProductImageEntity
+                    {
+                        ImagePath = filePath,
+                        ProductId = product.Id, 
+                    };
+
+                    productImages.Add(productImage);
+                }
+
+                product.ProductImages = productImages;
+            }
+            await _context.SaveChangesAsync();
+
+
+        }
+       
     }
 }
