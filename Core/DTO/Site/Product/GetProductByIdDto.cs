@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.DTO.Site.Product
 {
-    public class UpdateProductDto
+    public class GetProductByIdDto
     {
         public int Id { get; set; }
         [Required]
@@ -26,6 +26,6 @@ namespace Core.DTO.Site.Product
         public string LookAfterMe { get; set; }
         public string AboutMe { get; set; }
         public int Amount { get; set; }
-        public ICollection<IFormFile> ImageUrls { get; set; } = new List<IFormFile>();
+        public List<string> ImageUrls { get; set; }
     }
 }

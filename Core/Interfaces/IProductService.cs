@@ -20,5 +20,6 @@ namespace Core.Interfaces
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();
         Task<List<object>> GettAllGendersAsync();
+        Task<GetProductByIdDto> GetById(int id);
     }
 }

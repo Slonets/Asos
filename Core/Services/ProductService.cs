@@ -110,6 +110,42 @@ namespace Core.Services
             return _mapper.Map<CreateProductDto>(product);
         }
 
+        public async Task<GetProductByIdDto> GetById(int id)
+        {
+            var product = await _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Include(p => p.ProductImages)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                throw new ArgumentException("Product not found");
+            }
+
+         
+
+            // Перетворюємо дані продукту в DTO (Data Transfer Object)
+            var productDto = new GetProductByIdDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                CategoryId = product.CategoryId,
+                BrandId = product.BrandId,
+                Size = product.Size,
+                Color = product.Color,
+                Gender = product.Gender,
+                SizeAndFit = product.SizeAndFit,
+                LookAfterMe = product.LookAfterMe,
+                AboutMe = product.AboutMe,
+                Amount = product.Amount,
+                Price = product.Price,
+                ImageUrls = product.ProductImages.Select(img => img.ImagePath).ToList()  
+            };
+            return productDto;
+        }
+
         public async Task<List<GetAllProductDto>> GettAll()
         {
             var result = await _context.Products.ToListAsync();
