@@ -77,5 +77,24 @@ namespace AsosWeb.Controllers
             }
             return NotFound();
         }
+
+        [HttpGet("GetManClothing")]
+        public async Task<IActionResult> GetManClothing()
+        {
+            return Ok(await _productService.GetManClothingAsync());
+        }
+
+        [HttpGet("GetWomanClothing")]
+        public async Task<IActionResult> GetWomanClothing()
+        {
+            return Ok(await _productService.GetWomanClothingAsync());
+        }
+
+        [HttpPost("ArrayFavorite")]
+        public async Task<IActionResult> GetArrayFavorite([FromBody] int[] array)
+        {
+            var products = await _productService.GetArrayFavorite(array);
+            return Ok(products);
+        }
     }
 }

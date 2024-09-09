@@ -31,7 +31,7 @@ namespace AsosWeb.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IAccountService _accountService;
+        private readonly IAccountService _accountService;        
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         UserManager<UserEntity> _userManager;
@@ -45,7 +45,7 @@ namespace AsosWeb.Controllers
             _jwtTokenService = jwtTokenService;
             _userManager=userManager;
             _userEntity = userEntity;
-            _context=context;
+            _context=context;            
         }
 
         [AllowAnonymous]
@@ -236,11 +236,11 @@ namespace AsosWeb.Controllers
             return Ok(user);
         }
 
-
         [HttpPost("UnBlockUser")]
         public async Task<IActionResult> UnBlockUser([FromBody] BlockUserDto model)
         {
             return Ok(await _accountService.UnblockUser(model.UserId));
         }
+
     }
 }

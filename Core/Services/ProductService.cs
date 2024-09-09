@@ -4,7 +4,9 @@ using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities.Enums;
+using Infrastructure.Entities.Location;
 using Infrastructure.Entities.Site;
+using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +24,14 @@ namespace Core.Services
         private readonly IMapper _mapper;
         private readonly AsosDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IRepository<ProductEntity> _products;       
 
-        public ProductService(IMapper mapper, AsosDbContext asosDbContext, IWebHostEnvironment webHostEnvironment)
+        public ProductService(IRepository<ProductEntity> products, IMapper mapper, AsosDbContext asosDbContext, IWebHostEnvironment webHostEnvironment)
         {
             _mapper = mapper;
             _context = asosDbContext;
             _webHostEnvironment = webHostEnvironment;
+            _products=products;
         }
         public async Task Create(CreateProductDto model)
         {
@@ -77,13 +81,6 @@ namespace Core.Services
             }
         }
 
-
-
-
-       
-
-
-
         public async Task<bool> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -132,8 +129,7 @@ namespace Core.Services
         {
             return await Task.FromResult(GettAllGenders());
         }
-
-     
+             
         public List<object> GettAllSizes()
         {
             var sizeOptions = Enum.GetValues(typeof(Size))
@@ -153,6 +149,53 @@ namespace Core.Services
             return await Task.FromResult(GettAllSizes());
         }
 
-        
+        public async Task<List<ViewManClothingDto>> GetManClothingAsync()
+        {
+            var clothing = await _context.Products.Where(x => x.Gender == Gender.Male)
+                                                  .Include(x => x.ProductImages)
+                                                  .Include(x => x.Brand)
+                                                  .Include(x => x.Category)
+                                                  .ToListAsync();             
+
+            return _mapper.Map<List<ViewManClothingDto>>(clothing);
+        }
+        public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
+        {
+            var clothing = await _context.Products.Where(x => x.Gender == Gender.Female)
+                                                  .Include(x => x.ProductImages)
+                                                  .Include(x => x.Brand)
+                                                  .Include(x => x.Category)
+                                                  .ToListAsync();             
+
+            return _mapper.Map<List<ViewManClothingDto>>(clothing);
+        }
+
+        public async Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array)
+        {
+            // Отримуємо всі продукти
+            var products = await _products.GetIQueryable()
+                .Include(x=>x.ProductImages)
+                .Include(x=>x.Brand)
+                .Include(x=>x.Category)
+                .ToListAsync();
+           
+            var unit = products.ToArray();
+
+            // Ліст для повернення товарів
+            List<ProductEntity> returnProduct = new List<ProductEntity>();
+
+            // Для кожного елемента у масиві array перевіряємо наявність у unit
+            foreach (var id in array)
+            {
+                // Знаходимо товар з таким же ID
+                var product = unit.FirstOrDefault(p => p.Id == id);
+                if (product != null)
+                {
+                    returnProduct.Add(product);
+                }
+            }
+            
+            return _mapper.Map<List<ViewManClothingDto>>(returnProduct);
+        }
     }
 }
