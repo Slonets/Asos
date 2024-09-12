@@ -77,6 +77,43 @@ namespace AsosWeb.Controllers
             }
             return NotFound();
         }
+        [HttpPut("UpdateProduct/{id}")]
+        public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromForm] UpdateProductDto model)
+        {
+            try
+            {
+                model.Id = id;  
+                await _productService.Update(model);
+                return Ok(new { message = "Product updated successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the product", error = ex.Message });
+            }
+        }
+        [HttpGet("GetProductById/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var productDto = await _productService.GetById(id);
+                return Ok(productDto);
+            }
+            catch (ArgumentException ex)
+            {
+                // Повертаємо статус 404, якщо продукт не знайдено
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Обробляємо інші можливі помилки
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
 
         [HttpGet("GetManClothing")]
         public async Task<IActionResult> GetManClothing()
