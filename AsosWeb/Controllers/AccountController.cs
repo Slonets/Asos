@@ -31,7 +31,7 @@ namespace AsosWeb.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IAccountService _accountService;
+        private readonly IAccountService _accountService;        
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         UserManager<UserEntity> _userManager;
@@ -45,7 +45,7 @@ namespace AsosWeb.Controllers
             _jwtTokenService = jwtTokenService;
             _userManager=userManager;
             _userEntity = userEntity;
-            _context=context;
+            _context=context;            
         }
 
         [AllowAnonymous]
@@ -77,7 +77,6 @@ namespace AsosWeb.Controllers
             }
         }
 
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto model)
         {
@@ -107,47 +106,19 @@ namespace AsosWeb.Controllers
 
         [HttpPost("GoogleSignIn")]
         public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
-        {
-            try
-            {
-                UserEntity user = await _accountService.GoogleSignInAsync(model);
+        {           
 
-                var roles = await _userManager.GetRolesAsync(user);
+                var result = await _accountService.GoogleSignInAsync(model);
 
-                // Створюємо DTO для токена
-                var userTokenInfo = new UserTokenInfoDto
+                if (result.IsSuccess)
                 {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Birthday = user.Birthday?.ToString("dd-MM-yyyy"),
-                    Image = user.Image,
-                    PhoneNumber = user.PhoneNumber,
-                    Country = user.Address?.Town.CountryId,
-                    Town = user.Address?.Town.NameTown,
-                    Address = user.Address?.Street,
-                    PostCode = user.PostCode,
-                    Roles = roles.ToList()
-                };
 
-                // Створюємо токен на основі DTO
-                var token = await _jwtTokenService.CreateToken(userTokenInfo);
-
-
-                return Ok(new JwtTokenResponseDto
+                    return Ok(new { token = result.Token });
+                }
+                else
                 {
-                    Token = token
-                }) ;
-            }
-            catch (InvalidJwtException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (IdentityException e)
-            {
-                return StatusCode(500, e.IdentityResult.Errors);
-            }
+                    return BadRequest(result);
+                }                
         }
 
         [HttpPut("edit-user")]
@@ -265,11 +236,11 @@ namespace AsosWeb.Controllers
             return Ok(user);
         }
 
-
         [HttpPost("UnBlockUser")]
         public async Task<IActionResult> UnBlockUser([FromBody] BlockUserDto model)
         {
             return Ok(await _accountService.UnblockUser(model.UserId));
         }
+
     }
 }

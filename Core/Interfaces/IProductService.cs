@@ -1,11 +1,4 @@
-﻿using Core.DTO.Site.Category;
-using Core.DTO.Site.Product;
-using Infrastructure.Entities.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.DTO.Site.Product;
 
 namespace Core.Interfaces
 {
@@ -21,5 +14,9 @@ namespace Core.Interfaces
         Task<List<object>> GettAllSizesAsync();
         Task<List<object>> GettAllGendersAsync();
         Task<GetProductByIdDto> GetById(int id);
+        Task<List<ViewManClothingDto>> GetManClothingAsync();
+        Task<List<ViewManClothingDto>> GetWomanClothingAsync();
+
+        Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array);
     }
 }

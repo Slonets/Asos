@@ -8,7 +8,7 @@ namespace Core.Interfaces
     {
         Task<LoginResultDto> Login(LoginDto loginDto);
         Task<RegisterResultDto> Registration(RegisterDto dto);
-        Task<UserEntity> GoogleSignInAsync(GoogleSignInDto loginDto);
+        Task<LoginResultDto> GoogleSignInAsync(GoogleSignInDto loginDto);
         Task EditUserAsync(EditUserDto editUserDto); 
         Task EditAdrressUserAsync(EditAdrressUserDto editAdrressDto);
         Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser);

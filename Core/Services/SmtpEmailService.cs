@@ -45,7 +45,7 @@ namespace Core.Services
 
             // Створення об'єкта електронного листа
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("ASOS", _configuration.From));
+            emailMessage.From.Add(new MailboxAddress("UrbanCore", _configuration.From));
             emailMessage.To.Add(new MailboxAddress("Recipient Name", message.To));
             emailMessage.Subject = message.Subject;
             emailMessage.Body = multipart;

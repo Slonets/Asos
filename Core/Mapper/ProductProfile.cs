@@ -15,6 +15,10 @@ namespace Core.Mapper
         {
             CreateMap<CreateProductDto,ProductEntity>().ReverseMap();
             CreateMap<GetAllProductDto,ProductEntity>().ReverseMap();
+            CreateMap<ProductEntity, ViewManClothingDto>()
+            .ForMember(dest => dest.ImagePaths, opt => opt.MapFrom(src => src.ProductImages.Select(pi => pi.ImagePath).ToList()))
+            .ForMember(dest=>dest.Brand, opt=>opt.MapFrom(src=>src.Brand.Name))
+            .ForMember(dest=>dest.Category, opt=>opt.MapFrom(src=>src.Category.Name));
         }
     }
 }
