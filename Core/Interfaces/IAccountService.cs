@@ -15,6 +15,7 @@ namespace Core.Interfaces
         Task<UserEntity> GetUser(string id);
         Task<IdentityResult> BlockUser(int userId);
         Task<IdentityResult> UnblockUser(int userId);
-        Task<List<UserViewDto>> GetAllUsers();
+        //Task<List<UserViewDto>> GetAllUsers();
+        Task<PagedResult<UserViewDto>> GetAllUsers(int pageNumber, int pageSize);
     }
 }
