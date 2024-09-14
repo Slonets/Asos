@@ -11,7 +11,8 @@ namespace Core.Interfaces
 {
     public interface ICategoryService
     {
-        Task<PagedResult<CategoryDto>> GetAllCategories(int pageNumber, int pageSize);
+        Task<PagedResult<CategoryDto>> GetAllPageCategories(int pageNumber, int pageSize);
+        Task<List<CategoryDto>> GettAll();
         Task Create(CreateCategoryDto model);
         Task<bool> Delete(int id);
     }

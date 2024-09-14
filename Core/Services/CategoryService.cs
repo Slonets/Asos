@@ -45,7 +45,15 @@ namespace Core.Services
             await _context.SaveChangesAsync();
             return true; 
         }
-        public async Task<PagedResult<CategoryDto>> GetAllCategories(int pageNumber, int pageSize)
+
+        public async Task<List<CategoryDto>> GettAll()
+        {
+
+            var result = await _context.Category.ToListAsync();
+            return _mapper.Map<List<CategoryDto>>(result);
+
+        }
+        public async Task<PagedResult<CategoryDto>> GetAllPageCategories(int pageNumber, int pageSize)
         {
             var query = _context.Category;
 

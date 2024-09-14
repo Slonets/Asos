@@ -32,10 +32,17 @@ namespace AsosWeb.Controllers
             await _categoryService.Create(model);
             return Ok(model);
         }
+
         [HttpGet("GetAllCategory")]
+        public async Task<IActionResult> GetAllCategory()
+        {
+            return Ok(await _categoryService.GettAll());
+        }
+
+        [HttpGet("GetAllPageCategory")]
         public async Task<IActionResult> GetAllCategory([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _categoryService.GetAllCategories(pageNumber, pageSize);
+            var result = await _categoryService.GetAllPageCategories(pageNumber, pageSize);
             return Ok(result);
         }
 
