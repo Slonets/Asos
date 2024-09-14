@@ -1,4 +1,5 @@
-﻿using Core.DTO.Site.Category;
+﻿using Core.DTO.Authentication;
+using Core.DTO.Site.Category;
 using Core.DTO.Site.Product;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Core.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryDto>> GettAll();
+        Task<PagedResult<CategoryDto>> GetAllCategories(int pageNumber, int pageSize);
         Task Create(CreateCategoryDto model);
         Task<bool> Delete(int id);
     }

@@ -433,15 +433,7 @@ namespace Core.Services
 
             return result;
         }
-        //public async Task<List<UserViewDto>> GetAllUsers()
-        //{
-        //    var users = await _userEntity.GetIQueryable()
-        //        .Include(x=>x.UserRoles).ThenInclude(ur=>ur.Role)                
-        //        .ToListAsync();
-
-
-        //    return _mapper.Map<List<UserViewDto>>(users);
-        //}
+       
 
         public async Task<PagedResult<UserViewDto>> GetAllUsers(int pageNumber, int pageSize)
         {

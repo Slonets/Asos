@@ -213,13 +213,7 @@ namespace AsosWeb.Controllers
 
         }
 
-        //[HttpGet("GetAllUsers")]
-        //public async Task<IActionResult> GetAllUsers()
-        //{
-        //    return Ok(await _accountService.GetAllUsers());
-        //}
-
-        [HttpGet("GetAllUsers")]
+       [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             // Отримання користувачів із пагінацією через сервіс

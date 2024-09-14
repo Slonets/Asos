@@ -14,8 +14,7 @@ namespace Core.Interfaces
         Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto model, int idUser);
         Task<UserEntity> GetUser(string id);
         Task<IdentityResult> BlockUser(int userId);
-        Task<IdentityResult> UnblockUser(int userId);
-        //Task<List<UserViewDto>> GetAllUsers();
+        Task<IdentityResult> UnblockUser(int userId);        
         Task<PagedResult<UserViewDto>> GetAllUsers(int pageNumber, int pageSize);
     }
 }

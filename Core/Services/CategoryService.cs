@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Core.DTO.Authentication;
 using Core.DTO.Site.Category;
+using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities.Site;
@@ -43,13 +45,28 @@ namespace Core.Services
             await _context.SaveChangesAsync();
             return true; 
         }
-
-        public async Task<List<CategoryDto>> GettAll()
+        public async Task<PagedResult<CategoryDto>> GetAllCategories(int pageNumber, int pageSize)
         {
-            
-                var result = await _context.Category.ToListAsync();
-                return _mapper.Map<List<CategoryDto>>(result);
-            
+            var query = _context.Category;
+
+            // Загальна кількість категорій
+            var totalCategories = await query.CountAsync();
+
+            // Повернення категорій для конкретної сторінки
+            var categories = await query
+                .Skip((pageNumber - 1) * pageSize)  // Пропустити категорії для попередніх сторінок
+                .Take(pageSize)  // Вибрати категорії для поточної сторінки
+                .ToListAsync();
+
+            var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
+
+            return new PagedResult<CategoryDto>
+            {
+                Items = categoryDtos,
+                TotalCount = totalCategories,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
     }
 }
