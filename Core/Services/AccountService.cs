@@ -433,14 +433,31 @@ namespace Core.Services
 
             return result;
         }
-        public async Task<List<UserViewDto>> GetAllUsers()
+       
+
+        public async Task<PagedResult<UserViewDto>> GetAllUsers(int pageNumber, int pageSize)
         {
-            var users = await _userEntity.GetIQueryable()
-                .Include(x=>x.UserRoles).ThenInclude(ur=>ur.Role)                
+            var query = _userEntity.GetIQueryable()
+                .Include(x => x.UserRoles).ThenInclude(ur => ur.Role);
+
+            // Загальна кількість користувачів
+            var totalUsers = await query.CountAsync();
+
+            // Повернення користувачів для конкретної сторінки
+            var users = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
+            var userDtos = _mapper.Map<List<UserViewDto>>(users);
 
-            return _mapper.Map<List<UserViewDto>>(users);
+            return new PagedResult<UserViewDto>
+            {
+                Items = userDtos,
+                TotalCount = totalUsers,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
 
     }

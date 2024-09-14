@@ -1,4 +1,5 @@
-﻿using Core.DTO.Site.Product;
+﻿using Core.DTO.Authentication;
+using Core.DTO.Site.Product;
 
 namespace Core.Interfaces
 {
@@ -8,7 +9,7 @@ namespace Core.Interfaces
         Task<bool> Delete(int id);
         Task<CreateProductDto> Get(int id);
         Task Update(UpdateProductDto model);
-        Task<List<GetAllProductDto>> GettAll();
+        Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize);
         List<object> GettAllSizes();
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();
@@ -16,7 +17,6 @@ namespace Core.Interfaces
         Task<GetProductByIdDto> GetById(int id);
         Task<List<ViewManClothingDto>> GetManClothingAsync();
         Task<List<ViewManClothingDto>> GetWomanClothingAsync();
-
         Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array);
     }
 }

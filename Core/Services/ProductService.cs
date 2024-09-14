@@ -143,10 +143,28 @@ namespace Core.Services
             return productDto;
         }
 
-        public async Task<List<GetAllProductDto>> GettAll()
+        public async Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize)
         {
-            var result = await _context.Products.ToListAsync();
-            return _mapper.Map<List<GetAllProductDto>>(result);
+            var query = _context.Products;
+
+            // Загальна кількість продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
 
         public List<object> GettAllGenders()

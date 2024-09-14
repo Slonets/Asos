@@ -32,11 +32,20 @@ namespace AsosWeb.Controllers
             await _categoryService.Create(model);
             return Ok(model);
         }
+
         [HttpGet("GetAllCategory")]
         public async Task<IActionResult> GetAllCategory()
         {
             return Ok(await _categoryService.GettAll());
         }
+
+        [HttpGet("GetAllPageCategory")]
+        public async Task<IActionResult> GetAllCategory([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _categoryService.GetAllPageCategories(pageNumber, pageSize);
+            return Ok(result);
+        }
+
         [HttpGet("GetAllBrand")]
         public async Task<IActionResult> GetAllBrand()
         {
@@ -52,11 +61,14 @@ namespace AsosWeb.Controllers
         {
             return Ok(await _productService.GettAllGendersAsync());
         }
+
         [HttpGet("GetAllProducts")]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            return Ok(await _productService.GettAll());
+            var result = await _productService.GetAllProducts(pageNumber, pageSize);
+            return Ok(result);
         }
+
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
