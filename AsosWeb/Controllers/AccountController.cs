@@ -63,8 +63,15 @@ namespace AsosWeb.Controllers
 
                 if (result.IsSuccess)
                 {
-                
-                    return Ok(new { token = result.Token });
+
+                    if (result.baskets != null)
+                    {
+                        return Ok(new { token = result.Token, array = result.baskets });
+                    }
+                    else
+                    {
+                        return Ok(new { token = result.Token });
+                    }
                 }
                 else
                 {
@@ -105,15 +112,23 @@ namespace AsosWeb.Controllers
         }
 
         [HttpPost("GoogleSignIn")]
-        public async Task<IActionResult> GoogleSignIn([FromForm] GoogleSignInDto model)
+        public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInDto model)
         {           
 
                 var result = await _accountService.GoogleSignInAsync(model);
 
                 if (result.IsSuccess)
-                {
+                {                    
 
-                    return Ok(new { token = result.Token });
+                       if(result.baskets!=null)
+                       {
+                          return Ok(new { token = result.Token, baskets= result.baskets});
+                       }
+                       else
+                       {
+                             return Ok(new { token = result.Token });
+                       }
+
                 }
                 else
                 {

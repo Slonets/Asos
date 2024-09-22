@@ -9,5 +9,6 @@ namespace Core.DTO.Authentication
     public class GoogleSignInDto
     {
         public string Credential { get; set; } = null!;
+        public List<int> Baskets { get; set; }= new List<int>();
     }
 }

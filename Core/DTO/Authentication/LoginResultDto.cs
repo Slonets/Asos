@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Entities.Site;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,6 @@ namespace Core.DTO.Authentication
         public bool IsSuccess { get; set; }
         public string Error { get; set; } = String.Empty;
         public string Token { get; set; } = String.Empty;
+        public List<int>? baskets { get; set; }
     }
 }

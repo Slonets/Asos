@@ -20,6 +20,7 @@ namespace Infrastructure.Data
         public DbSet<ProductImageEntity> ProductImages { get; set; }
         public DbSet<OrderEntity> Orders { get; set; }
         public DbSet<OrderProductEntity> OrderProducts { get; set; }
+        public DbSet<BasketEntity> Basket { get; set; }
         public AsosDbContext(DbContextOptions<AsosDbContext> options)
         : base(options) { }
 
