@@ -7,6 +7,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities;
 using Infrastructure.Entities.Location;
+using Infrastructure.Entities.Site;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -25,13 +26,15 @@ namespace Core.Services
         private readonly IRepository<UserEntity> _userEntity;
         private readonly IRepository<AddressEntity> _addressEntity;
         private readonly IRepository<TownEntity> _townEntity;
+        private readonly IRepository<BasketEntity> _basketEntity;
         private readonly IRepository<CountryEntity> _countryEntity;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ISmtpEmailService _emailService;
         private readonly AsosDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IFotoAvatar _fotoAvatar;       
+        private readonly IFotoAvatar _fotoAvatar;    
+        private readonly IBasketService _basketService;
 
         public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
@@ -43,7 +46,9 @@ namespace Core.Services
             IFotoAvatar fotoAvatar,
             IRepository<AddressEntity> addressEntity,
             IRepository<TownEntity> townEntity,
-            IRepository<CountryEntity> countryEntity
+            IRepository<CountryEntity> countryEntity,
+            IRepository<BasketEntity> basketEntity,
+            IBasketService basketService
             )
         {
 
@@ -58,6 +63,8 @@ namespace Core.Services
             _addressEntity=addressEntity;
             _townEntity = townEntity;
             _countryEntity = countryEntity;
+            _basketEntity = basketEntity;
+            _basketService = basketService;
         }
 
         public async Task<LoginResultDto> GoogleSignInAsync(GoogleSignInDto model)
@@ -104,6 +111,32 @@ namespace Core.Services
 
             // Створюємо токен на основі DTO
             var token = await _jwtTokenService.CreateToken(userTokenInfo);
+
+            // Перетворюємо кошик у масив
+            var basketArray = model.Baskets.ToArray();
+
+            // Якщо користувач передав кошик із товарами
+            if (basketArray.Length > 0)
+            {
+                // Зберігаємо кошик користувача в базу даних
+                await _basketService.pushBasketArray(user.Id, basketArray);
+
+                // Отримуємо поточний кошик користувача з бази
+                var array = await _basketEntity.GetAsync();
+
+                // Вибираємо товари тільки для цього користувача
+                List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+
+                // Створюємо список ID продуктів із кошика
+                List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+
+                // Передаємо список ID продуктів у відповідь
+                loginResultDto.baskets = newListIdBasket;
+            }
+            else
+            {
+                loginResultDto.baskets = null; // Якщо кошик порожній
+            }
 
             loginResultDto.Token = token;
             loginResultDto.IsSuccess = true;
@@ -240,9 +273,29 @@ namespace Core.Services
                 Roles = roles.ToList(),
             };
 
+            var basketArray = model.basket.ToArray();
+
+            if(basketArray.Length > 0 )
+            {
+                await _basketService.pushBasketArray(user.Id, basketArray);
+
+                var array = await _basketEntity.GetAsync();
+
+                List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+
+                List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+
+                loginResultDto.baskets = newListIdBasket;
+            }
+            else
+            {
+                loginResultDto.baskets = null;
+            }        
+
 
             var token = await _jwtTokenService.CreateToken(userTokenInfo);
             loginResultDto.Token = token;
+            
             loginResultDto.IsSuccess=true;
 
             return loginResultDto;
