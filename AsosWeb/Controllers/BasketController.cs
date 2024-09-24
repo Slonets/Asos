@@ -48,5 +48,39 @@ namespace AsosWeb.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost("GetBasketItems")]
+        public async Task<IActionResult> GetBasketItems([FromBody] int[] array)
+        {
+            string number = User.Claims.ToList()[0].Value.ToString();
+
+            int idUser = int.Parse(number);
+
+            var basket = await _basket.GetBasketItems(idUser, array);
+
+            return Ok(basket);
+        }
+
+        [HttpPost("GetBasketItemLogout")]
+        public async Task<IActionResult> GetBasketItemsLogout([FromBody] int[] array)
+        {      
+
+            var basket = await _basket.GetBasketItemsLogout(array);
+
+            return Ok(basket);
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteBasket/{productId}")]
+        public async Task<IActionResult> DeleteProductWithBaset([FromRoute] int productId)
+        {
+            string number = User.Claims.ToList()[0].Value.ToString();
+
+            int idUser = int.Parse(number);
+
+            var array = await _basket.DeleteProductWithBascet(idUser, productId);
+
+            return Ok(array);
+        }
     }
 }

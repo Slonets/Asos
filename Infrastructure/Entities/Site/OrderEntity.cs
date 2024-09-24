@@ -16,7 +16,6 @@ namespace Infrastructure.Entities.Site
         [ForeignKey("User")]
         public int UserId { get; set; }
         public virtual UserEntity User { get; set; }
-
         [ForeignKey("OrderStatus")]
         public int OrderStatusId { get; set; }
         public virtual OrderStatusEntity OrderStatus { get; set; }
