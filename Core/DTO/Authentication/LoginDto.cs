@@ -9,7 +9,7 @@ namespace Core.DTO.Authentication
     public class LoginDto
     {
         public string? Email { get; set; }
-        public string? Password { get; set; }           
-        public List<int> basket { get; set; }
+        public string? Password { get; set; }
+        public List<int> Baskets { get; set; } = new List<int>();
     }
 }

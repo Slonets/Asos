@@ -16,7 +16,6 @@ namespace Infrastructure.Entities.Site
         [ForeignKey("Order")]
         public int OrderId { get; set; }
         public OrderEntity Order { get; set; }
-
         [ForeignKey("Product")]
         public int ProductId { get; set; }
         public ProductEntity Product { get; set; }

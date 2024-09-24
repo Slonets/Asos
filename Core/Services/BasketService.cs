@@ -1,13 +1,18 @@
 ﻿using Core.DTO.Authentication;
+using Core.DTO.Site.Product;
 using Core.Interfaces;
+using Infrastructure.Data;
+using Infrastructure.Entities.Enums;
 using Infrastructure.Entities.Location;
 using Infrastructure.Entities.Site;
 using Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Core.Services
 {
@@ -16,11 +21,13 @@ namespace Core.Services
 
         private readonly IRepository<BasketEntity> _basket;
         private readonly IRepository<ProductEntity> _product;
+        private readonly AsosDbContext _context;
 
-        public BasketService(IRepository<BasketEntity> basket, IRepository<ProductEntity> product) 
+        public BasketService(IRepository<BasketEntity> basket, IRepository<ProductEntity> product, AsosDbContext context) 
         {
             _basket = basket;
             _product = product;
+            _context = context;
         }
 
         public async Task pushBasketById(int idUser, int productId)
@@ -89,5 +96,74 @@ namespace Core.Services
             await _basket.SaveAsync();
         }
 
+        public async Task<List<BasketViewItem>> GetBasketItems(int userId, int[]array)
+        {
+            List<BasketViewItem> items = await _context.Basket
+            .Where(x => x.UserId == userId && array.Contains(x.ProductId))
+            .Select(x => new BasketViewItem
+            {
+                Id= x.Product.Id,
+                Name = x.Product.Name,
+                Description = x.Product.Description,
+                Price = x.Product.Price,
+                Size = x.Product.Size,
+                Color = x.Product.Color,
+                Brand = x.Product.Brand.Name,
+                Category = x.Product.Category.Name,
+                Gender = x.Product.Gender,
+                LookAfterMe = x.Product.LookAfterMe,
+                AboutMe = x.Product.AboutMe,
+                SizeAndFit = x.Product.SizeAndFit,
+                Amount = 1,
+                ImagePaths = x.Product.ProductImages.Select(pi => pi.ImagePath).ToList()
+                }).ToListAsync();
+
+            return items;
+        }
+        public async Task<List<BasketViewItem>> GetBasketItemsLogout(int[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return new List<BasketViewItem>();
+            }
+
+            List<BasketViewItem> items = await _context.Products
+                .Where(x => array.Contains(x.Id))
+                .Select(x => new BasketViewItem
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    Price = x.Price,
+                    Size = x.Size,
+                    Color = x.Color,
+                    Brand = x.Brand.Name,
+                    Category = x.Category.Name,
+                    Gender = x.Gender,
+                    LookAfterMe = x.LookAfterMe,
+                    AboutMe = x.AboutMe,
+                    SizeAndFit = x.SizeAndFit,
+                    Amount = 1,
+                    ImagePaths = x.ProductImages.Select(pi => pi.ImagePath).ToList()
+                }).ToListAsync();
+
+            return items;
+        }
+        
+        public async Task<List<int>> DeleteProductWithBascet(int userId, int productId)
+        {
+            var basketItem = await _context.Basket.FirstOrDefaultAsync(x => x.UserId == userId && x.ProductId == productId);
+
+            if (basketItem != null)
+            {
+                _context.Basket.Remove(basketItem);
+                
+                await _context.SaveChangesAsync();
+            }
+
+            List<int> array = await _context.Basket.Where(x => x.UserId == userId).Select(x => x.ProductId).ToListAsync();
+
+            return array;
+        }
     }
 }

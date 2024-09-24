@@ -112,6 +112,9 @@ namespace Core.Services
             // Створюємо токен на основі DTO
             var token = await _jwtTokenService.CreateToken(userTokenInfo);
 
+            if(model.Baskets.Count>0)
+            {           
+
             // Перетворюємо кошик у масив
             var basketArray = model.Baskets.ToArray();
 
@@ -136,6 +139,22 @@ namespace Core.Services
             else
             {
                 loginResultDto.baskets = null; // Якщо кошик порожній
+            }
+            }
+            else
+            {
+
+                // Отримуємо поточний кошик користувача з бази
+                var array = await _basketEntity.GetAsync();
+
+                // Вибираємо товари тільки для цього користувача
+                List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+
+                // Створюємо список ID продуктів із кошика
+                List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+
+                // Передаємо список ID продуктів у відповідь
+                loginResultDto.baskets = newListIdBasket;
             }
 
             loginResultDto.Token = token;
@@ -273,27 +292,53 @@ namespace Core.Services
                 Roles = roles.ToList(),
             };
 
-            var basketArray = model.basket.ToArray();
+            var token = await _jwtTokenService.CreateToken(userTokenInfo);
 
-            if(basketArray.Length > 0 )
+            if (model.Baskets.Count > 0)
             {
-                await _basketService.pushBasketArray(user.Id, basketArray);
 
-                var array = await _basketEntity.GetAsync();
+                // Перетворюємо кошик у масив
+                var basketArray = model.Baskets.ToArray();
 
-                List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+                // Якщо користувач передав кошик із товарами
+                if (basketArray.Length > 0)
+                {
+                    // Зберігаємо кошик користувача в базу даних
+                    await _basketService.pushBasketArray(user.Id, basketArray);
 
-                List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+                    // Отримуємо поточний кошик користувача з бази
+                    var array = await _basketEntity.GetAsync();
 
-                loginResultDto.baskets = newListIdBasket;
+                    // Вибираємо товари тільки для цього користувача
+                    List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+
+                    // Створюємо список ID продуктів із кошика
+                    List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+
+                    // Передаємо список ID продуктів у відповідь
+                    loginResultDto.baskets = newListIdBasket;
+                }
+                else
+                {
+                    loginResultDto.baskets = null; // Якщо кошик порожній
+                }
             }
             else
             {
-                loginResultDto.baskets = null;
-            }        
 
+                // Отримуємо поточний кошик користувача з бази
+                var array = await _basketEntity.GetAsync();
 
-            var token = await _jwtTokenService.CreateToken(userTokenInfo);
+                // Вибираємо товари тільки для цього користувача
+                List<BasketEntity> arrayUser = array.Where(x => x.UserId == user.Id).ToList();
+
+                // Створюємо список ID продуктів із кошика
+                List<int> newListIdBasket = arrayUser.Select(item => item.ProductId).ToList();
+
+                // Передаємо список ID продуктів у відповідь
+                loginResultDto.baskets = newListIdBasket;
+            }
+
             loginResultDto.Token = token;
             
             loginResultDto.IsSuccess=true;

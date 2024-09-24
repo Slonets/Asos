@@ -66,7 +66,7 @@ namespace AsosWeb.Controllers
 
                     if (result.baskets != null)
                     {
-                        return Ok(new { token = result.Token, array = result.baskets });
+                        return Ok(new { token = result.Token, baskets = result.baskets });
                     }
                     else
                     {
