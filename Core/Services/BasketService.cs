@@ -1,4 +1,5 @@
 ﻿using Core.DTO.Authentication;
+using Core.DTO.Site.Basket;
 using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -6,10 +7,13 @@ using Infrastructure.Entities.Enums;
 using Infrastructure.Entities.Location;
 using Infrastructure.Entities.Site;
 using Infrastructure.Interfaces;
+using MailKit.Search;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -21,13 +25,15 @@ namespace Core.Services
 
         private readonly IRepository<BasketEntity> _basket;
         private readonly IRepository<ProductEntity> _product;
+        private readonly IRepository<OrderStatusEntity> _status;
         private readonly AsosDbContext _context;
 
-        public BasketService(IRepository<BasketEntity> basket, IRepository<ProductEntity> product, AsosDbContext context) 
+        public BasketService(IRepository<OrderStatusEntity> status, IRepository<BasketEntity> basket, IRepository<ProductEntity> product, AsosDbContext context) 
         {
             _basket = basket;
             _product = product;
             _context = context;
+            _status= status;
         }
 
         public async Task pushBasketById(int idUser, int productId)
@@ -164,6 +170,44 @@ namespace Core.Services
             List<int> array = await _context.Basket.Where(x => x.UserId == userId).Select(x => x.ProductId).ToListAsync();
 
             return array;
+        }
+
+        public async Task PushOrderWhenLogin(int userId, List<OrderItemDto> orderItems)
+        {      
+
+            var status = await _context.OrderStatus.Where(x => x.Name == "Booked").FirstOrDefaultAsync();
+
+            var amount = orderItems.FirstOrDefault().Amount;
+
+            var order = new OrderEntity
+            { 
+                UserId = userId , 
+                OrderStatusId= status.Id,
+                DateCrated= DateTime.UtcNow,
+                Amount= amount
+            };
+
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+
+            var listProduct = new List<OrderProductEntity>();
+            
+            foreach(var item in orderItems) 
+            {
+                listProduct.Add(
+                    new OrderProductEntity
+                    {
+                        OrderId = order.Id,
+                        ProductId = item.ProductId,
+                        Count=item.Count,
+                        Price=item.Price
+                    });
+            }
+
+            _context.OrderProducts.AddRange(listProduct);
+            
+            await _context.SaveChangesAsync();
         }
     }
 }

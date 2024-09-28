@@ -8,6 +8,7 @@ using Infrastructure.Entities.Enums;
 using Infrastructure.Entities.Location;
 using System;
 using Core.Interfaces;
+using System.Threading.Channels;
 
 namespace AsosWeb
 {
@@ -974,6 +975,22 @@ namespace AsosWeb
 
                     context.Country.AddRange(countries);
                     context.SaveChanges();
+                }
+
+                #endregion
+
+                #region OrderStatus
+
+                if(!context.OrderStatus.Any())
+                {
+                    var booked = new OrderStatusEntity { Name = "Booked" };
+                    var delivery = new OrderStatusEntity { Name = "Delivery" };
+                    var bought = new OrderStatusEntity { Name = "Bought" };
+
+                    context.OrderStatus.AddRange([booked, delivery, bought]);
+
+                    context.SaveChanges();
+
                 }
 
                 #endregion
