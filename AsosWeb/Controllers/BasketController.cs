@@ -1,4 +1,5 @@
 ﻿using Core.DTO.Authentication;
+using Core.DTO.Site.Basket;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -81,6 +82,19 @@ namespace AsosWeb.Controllers
             var array = await _basket.DeleteProductWithBascet(idUser, productId);
 
             return Ok(array);
+        }
+
+
+        [HttpPost("PushOrderWhenLogin")]
+        public async Task<IActionResult> PushOrderWhenLogin([FromBody] List<OrderItemDto> orderItems)
+        {
+            string number = User.Claims.ToList()[0].Value.ToString();
+
+            int idUser = int.Parse(number);
+
+            await _basket.PushOrderWhenLogin(idUser, orderItems);
+
+            return Ok();
         }
     }
 }

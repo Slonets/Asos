@@ -35,6 +35,7 @@ namespace Core.Services
         private readonly IConfiguration _configuration;
         private readonly IFotoAvatar _fotoAvatar;    
         private readonly IBasketService _basketService;
+        
 
         public AccountService(UserManager<UserEntity> userManager,
             IMapper mapper,
@@ -112,7 +113,9 @@ namespace Core.Services
             // Створюємо токен на основі DTO
             var token = await _jwtTokenService.CreateToken(userTokenInfo);
 
-            if(model.Baskets.Count>0)
+            loginResultDto.Token = token;
+
+            if (model.Baskets.Count>0)
             {           
 
             // Перетворюємо кошик у масив
@@ -155,9 +158,15 @@ namespace Core.Services
 
                 // Передаємо список ID продуктів у відповідь
                 loginResultDto.baskets = newListIdBasket;
+            }            
+
+            if (model.Orders.Count > 0)
+            {
+
+                await _basketService.PushOrderWhenLogin(user.Id, model.Orders);
             }
 
-            loginResultDto.Token = token;
+
             loginResultDto.IsSuccess = true;
 
             return loginResultDto;
@@ -294,6 +303,8 @@ namespace Core.Services
 
             var token = await _jwtTokenService.CreateToken(userTokenInfo);
 
+            loginResultDto.Token = token;
+
             if (model.Baskets.Count > 0)
             {
 
@@ -339,7 +350,11 @@ namespace Core.Services
                 loginResultDto.baskets = newListIdBasket;
             }
 
-            loginResultDto.Token = token;
+           if(model.Orders.Count>0)
+           {
+
+                await _basketService.PushOrderWhenLogin(user.Id, model.Orders);
+           }
             
             loginResultDto.IsSuccess=true;
 
@@ -532,7 +547,6 @@ namespace Core.Services
             return result;
         }
        
-
         public async Task<PagedResult<UserViewDto>> GetAllUsers(int pageNumber, int pageSize)
         {
             var query = _userEntity.GetIQueryable()

@@ -1,5 +1,7 @@
-﻿using Core.DTO.Site.Product;
+﻿using Core.DTO.Site.Basket;
+using Core.DTO.Site.Product;
 using Infrastructure.Entities.Site;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Core.Interfaces
         Task<List<BasketViewItem>> GetBasketItems(int userId, int[] array);
         Task<List<BasketViewItem>> GetBasketItemsLogout(int[] array);
         Task<List<int>> DeleteProductWithBascet(int userId, int productId);
-
+        Task PushOrderWhenLogin(int userId, List<OrderItemDto> orderItems);
 
     }
 }
