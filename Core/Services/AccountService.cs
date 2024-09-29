@@ -88,6 +88,10 @@ namespace Core.Services
                 string lockoutDate = user.LockoutEnd.Value.ToString("MM/dd/yyyy");
 
                 loginResultDto.Error = $"User {user.FirstName} {user.LastName} LOCKED to {lockoutDate}";
+
+                loginResultDto.Token = "";
+                loginResultDto.baskets = null;
+
                 return loginResultDto;
             }
 
