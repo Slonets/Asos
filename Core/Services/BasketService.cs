@@ -208,6 +208,13 @@ namespace Core.Services
             _context.OrderProducts.AddRange(listProduct);
             
             await _context.SaveChangesAsync();
+
+            foreach(var item in orderItems)
+            {
+                await DeleteProductWithBascet(userId, item.ProductId);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
