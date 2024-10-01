@@ -13,6 +13,6 @@ namespace Core.Interfaces
 {
     public interface IOrderService
     {
-        Task <List<OrderInformationDto>>GetInfarmationAboutOrder(int idUser);
+        Task<PagedResult<OrderInformationDto>> GetInfarmationAboutOrder(int idUser, int page, int pageSize);
     }
 }

@@ -19,13 +19,13 @@ namespace AsosWeb.Controllers
 
         [Authorize]
         [HttpGet("OrderInfo")]
-        public async Task<IActionResult> OrderInformation()
+        public async Task<IActionResult> OrderInformation([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 2)
         {
             string number = User.Claims.ToList()[0].Value.ToString();
 
             int idUser = int.Parse(number);
 
-            var orders = await _orderService.GetInfarmationAboutOrder(idUser);
+            var orders = await _orderService.GetInfarmationAboutOrder(idUser, pageNumber, pageSize);
 
             return Ok(orders);
         }
