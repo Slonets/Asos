@@ -29,5 +29,15 @@ namespace AsosWeb.Controllers
 
             return Ok(orders);
         }
+
+        [Authorize]
+        [HttpGet("OrderById")]
+        public async Task<IActionResult> OrderById([FromQuery] int id, [FromQuery] int pageNumber= 1, [FromQuery] int pageSize=4)
+        {            
+
+            var orders = await _orderService.GetOrderById(id, pageNumber, pageSize);
+
+            return Ok(orders);
+        }
     }
 }

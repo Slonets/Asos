@@ -1,5 +1,6 @@
 ﻿using Core.DTO.Authentication;
 using Core.DTO.Site.Basket;
+using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Entities.Location;
@@ -56,6 +57,49 @@ namespace Core.Services
                 CurrentPage = pageNumber
             };
 
+        }
+
+        public async Task<PagedResult<BasketViewItem>> GetOrderById(int id, int pageNumber, int pageSize)
+        {
+            var orders = _context.Orders
+       .Where(x => x.Id == id)
+       .Include(x => x.OrderProducts)
+           .ThenInclude(op => op.Product) // Приєднуємо продукти до OrderProducts
+       .SelectMany(order => order.OrderProducts.Select(op => new BasketViewItem
+       {
+           Id = op.Product.Id,
+           Name = op.Product.Name,
+           Description = op.Product.Description,
+           Price = op.Price, 
+           Color = op.Product.Color,
+           Brand = op.Product.Brand.Name, 
+           Category = op.Product.Category.Name,
+           Gender = op.Product.Gender,
+           LookAfterMe = op.Product.LookAfterMe,
+           AboutMe = op.Product.AboutMe,
+           SizeAndFit = op.Product.SizeAndFit,
+           Amount = op.Count, 
+           ImagePaths = op.Product.ProductImages.Select(pi => pi.ImagePath).ToList() // Припускаємо, що ProductImage має поле ImagePath
+       }));
+
+
+            // Загальна кількість користувачів
+            var totalOrders = await orders.CountAsync();
+
+            // Повернення користувачів для конкретної сторінки
+            var items = await orders
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<BasketViewItem>
+            {
+                Items = items,
+                TotalCount = totalOrders,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+           
         }
     }
 }
