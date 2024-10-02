@@ -1,5 +1,6 @@
 ﻿using Core.DTO.Authentication;
 using Core.DTO.Site.Basket;
+using Core.DTO.Site.Product;
 using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ namespace Core.Interfaces
 {
     public interface IOrderService
     {
-        Task <List<OrderInformationDto>>GetInfarmationAboutOrder(int idUser);
+        Task<PagedResult<OrderInformationDto>> GetInfarmationAboutOrder(int idUser, int page, int pageSize);
+
+        Task<PagedResult<BasketViewItem>> GetOrderById(int id, int pageNumber, int pageSize);
     }
 }
