@@ -27,5 +27,6 @@ namespace Core.DTO.Site.Product
         public string AboutMe { get; set; }
         public int Amount { get; set; }
         public ICollection<IFormFile> ImageUrls { get; set; } = new List<IFormFile>();
+        public List<string> ImageUrlsToRemove { get; set; } = new List<string>();
     }
 }

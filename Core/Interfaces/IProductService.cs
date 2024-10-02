@@ -1,5 +1,6 @@
 ﻿using Core.DTO.Authentication;
 using Core.DTO.Site.Product;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Interfaces
 {
@@ -18,5 +19,7 @@ namespace Core.Interfaces
         Task<List<ViewManClothingDto>> GetManClothingAsync();
         Task<List<ViewManClothingDto>> GetWomanClothingAsync();
         Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array);
+        Task<bool> DeleteImageAsync(string imagePath);
+        Task AddProductImages(int productId, List<IFormFile> images);
     }
 }

@@ -11,6 +11,7 @@ using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -83,6 +84,55 @@ namespace Core.Services
             }
         }
 
+        public async Task AddProductImages(int productId, List<IFormFile> images)
+        {
+            var product = await _context.Products.Include(p => p.ProductImages)
+                                                 .FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product == null)
+                throw new KeyNotFoundException("Product not found");
+
+            if (images != null && images.Any())
+            {
+                var imgList = new List<ProductImageEntity>();
+                string webRootPath = _webHostEnvironment.WebRootPath;
+
+                if (string.IsNullOrEmpty(webRootPath))
+                {
+                    throw new InvalidOperationException("Web root path is not set.");
+                }
+
+                string upload = Path.Combine(webRootPath, "product");
+
+                if (!Directory.Exists(upload))
+                {
+                    Directory.CreateDirectory(upload);
+                }
+
+                foreach (var imgFile in images)
+                {
+                    string fileName = Guid.NewGuid().ToString();
+                    string extensions = Path.GetExtension(imgFile.FileName);
+
+                    using (var fileStream = new FileStream(Path.Combine(upload, fileName + extensions), FileMode.Create))
+                    {
+                        await imgFile.CopyToAsync(fileStream);
+                    }
+
+                    var img = new ProductImageEntity
+                    {
+                        ImagePath = fileName + extensions,
+                        ProductId = productId
+                    };
+
+                    imgList.Add(img);
+                }
+
+                _context.ProductImages.AddRange(imgList);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<bool> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -95,6 +145,9 @@ namespace Core.Services
             await _context.SaveChangesAsync();
             return true; // Видалення успішне
         }
+
+
+
 
         public async Task<CreateProductDto> Get(int id)
         {
@@ -208,15 +261,14 @@ namespace Core.Services
         public async Task Update(UpdateProductDto model)
         {
             int id = model.Id;
-
-            var product = await _context.Products.FindAsync(id);
-
+            var product = await _context.Products.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 throw new ArgumentException("Product not found");
             }
 
+            // Оновлення даних продукту
             product.Name = model.Name;
             product.Description = model.Description;
             product.Price = model.Price;
@@ -224,43 +276,57 @@ namespace Core.Services
             product.Color = model.Color;
             product.BrandId = model.BrandId;
             product.CategoryId = model.CategoryId;
-            product.Gender= model.Gender;
+            product.Gender = model.Gender;
             product.LookAfterMe = model.LookAfterMe;
             product.AboutMe = model.AboutMe;
             product.SizeAndFit = model.SizeAndFit;
             product.Amount = model.Amount;
 
+            // Видалення зображень
+            if (model.ImageUrlsToRemove != null && model.ImageUrlsToRemove.Count > 0)
+            {
+                foreach (var imagePath in model.ImageUrlsToRemove)
+                {
+                    // Знайти зображення в базі
+                    var imageEntity = product.ProductImages.FirstOrDefault(img => img.ImagePath == imagePath);
+                    if (imageEntity != null)
+                    {
+                        // Видалити файл
+                        if (File.Exists(imagePath))
+                        {
+                            File.Delete(imagePath);
+                        }
+
+                        // Видалити запис з бази
+                        _context.ProductImages.Remove(imageEntity);
+                    }
+                }
+            }
+
+            // Додавання нових зображень
             if (model.ImageUrls != null)
             {
-                var productImages = new List<ProductImageEntity>();
                 foreach (var file in model.ImageUrls)
                 {
-
                     var filePath = Path.Combine("wwwroot", "img", file.FileName);
-
-
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        file.CopyTo(stream);
+                        await file.CopyToAsync(stream);
                     }
-
 
                     var productImage = new ProductImageEntity
                     {
                         ImagePath = filePath,
-                        ProductId = product.Id, 
+                        ProductId = product.Id,
                     };
 
-                    productImages.Add(productImage);
+                    product.ProductImages.Add(productImage); 
                 }
-
-                product.ProductImages = productImages;
             }
+
             await _context.SaveChangesAsync();
-
-
         }
-       
+
         public async Task<List<ViewManClothingDto>> GetManClothingAsync()
         {
             var clothing = await _context.Products.Where(x => x.Gender == Gender.Male)
@@ -308,6 +374,36 @@ namespace Core.Services
             }
             
             return _mapper.Map<List<ViewManClothingDto>>(returnProduct);
+        }
+
+        public async Task<bool> DeleteImageAsync(string imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath))
+            {
+                return false; // Шлях до зображення не може бути пустим
+            }
+
+            // Знайдемо зображення в базі даних
+            var imageEntity = await _context.ProductImages.FirstOrDefaultAsync(img => img.ImagePath == imagePath);
+
+            if (imageEntity == null)
+            {
+                return false; // Зображення не знайдено
+            }
+
+            // Логіка видалення файлу з файлової системи
+            var filePath = Path.Combine("wwwroot/images/products", imageEntity.ImagePath); // Вкажіть правильний шлях до вашого зображення
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath); // Видалення файлу
+            }
+
+            // Видалення запису з бази даних
+            _context.ProductImages.Remove(imageEntity);
+            await _context.SaveChangesAsync();
+
+            return true; // Видалення успішне
         }
     }
 }
