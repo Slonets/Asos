@@ -92,6 +92,7 @@ namespace AsosWeb.Controllers
         [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromForm] UpdateProductDto model)
         {
+
             try
             {
                 model.Id = id;  
@@ -144,6 +145,41 @@ namespace AsosWeb.Controllers
         {
             var products = await _productService.GetArrayFavorite(array);
             return Ok(products);
+        }
+        [HttpDelete("DeleteImage")]
+        public async Task<IActionResult> DeleteImage([FromBody] DeleteImageRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.ImagePath))
+            {
+                return BadRequest("Image path is required.");
+            }
+
+            bool result = await _productService.DeleteImageAsync(request.ImagePath);
+
+            if (!result)
+            {
+                return NotFound("Image not found or could not be deleted.");
+            }
+
+            return Ok("Image deleted successfully.");
+        }
+        public class DeleteImageRequest
+        {
+            public string ImagePath { get; set; }
+        }
+
+        [HttpPut("AddProductImages/{productId}")]
+        public async Task<IActionResult> AddProductImages(int productId, [FromForm] List<IFormFile> images)
+        {
+            try
+            {
+                await _productService.AddProductImages(productId, images);
+                return Ok(new { message = "Images added successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
