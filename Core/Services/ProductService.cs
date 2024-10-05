@@ -324,13 +324,16 @@ namespace Core.Services
 
         public async Task<List<ViewManClothingDto>> GetManClothingAsync()
         {
-            var clothing = await _context.Products.Where(x => x.Gender == Gender.Male)
-                                                  .Include(x => x.ProductImages)
-                                                  .Include(x => x.Brand)
-                                                  .Include(x => x.Category)
-                                                  .ToListAsync();             
+            var clothing = await _context.Products
+                                  .Where(x => x.Gender == Gender.Male)
+                                  .Include(x => x.ProductImages)
+                                  .Include(x => x.Brand)
+                                  .Include(x => x.Category)
+                                  .GroupBy(x => x.Name) // Групування за назвою
+                                  .Select(g => g.First()) // Беремо тільки перший товар з однаковою назвою
+                                  .ToListAsync();
 
-            return _mapper.Map<List<ViewManClothingDto>>(clothing);
+            return _mapper.Map<List<ViewManClothingDto>>(clothing);           
         }
         public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
         {
@@ -338,6 +341,8 @@ namespace Core.Services
                                                   .Include(x => x.ProductImages)
                                                   .Include(x => x.Brand)
                                                   .Include(x => x.Category)
+                                                  .GroupBy(x => x.Name) // Групування за назвою
+                                                  .Select(g => g.First()) // Беремо тільки перший товар з однаковою назвою
                                                   .ToListAsync();             
 
             return _mapper.Map<List<ViewManClothingDto>>(clothing);
@@ -399,6 +404,22 @@ namespace Core.Services
             await _context.SaveChangesAsync();
 
             return true; // Видалення успішне
+        }
+
+        public async Task<int> ReturnNewProductSize(string nameProduct, int newSize)
+        {
+
+            // Перетворюємо рядок на enum без перевірки
+            var parsedSize = (Size)newSize;
+
+            // Знаходимо продукт за назвою та розміром
+            var clothing = await _context.Products
+                                        .Where(x => x.Name == nameProduct && x.Size == parsedSize)
+                                        .FirstOrDefaultAsync();
+
+            int result = clothing.Id;
+
+            return result;
         }
     }
 }
