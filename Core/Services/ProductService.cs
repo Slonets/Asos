@@ -146,9 +146,6 @@ namespace Core.Services
             return true; // Видалення успішне
         }
 
-
-
-
         public async Task<CreateProductDto> Get(int id)
         {
             if (id < 0) return null; // exception handling
@@ -171,9 +168,7 @@ namespace Core.Services
             if (product == null)
             {
                 throw new ArgumentException("Product not found");
-            }
-
-         
+            }         
 
             // Перетворюємо дані продукту в DTO (Data Transfer Object)
             var productDto = new GetProductByIdDto
@@ -181,11 +176,11 @@ namespace Core.Services
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                CategoryId = product.CategoryId,
-                BrandId = product.BrandId,
-                Size = product.Size,
+                CategoryName = product.Category.Name,
+                BrandName = product.Brand.Name,
+                Size = product.Size.ToString(),
                 Color = product.Color,
-                Gender = product.Gender,
+                Gender = product.Gender.ToString(),
                 SizeAndFit = product.SizeAndFit,
                 LookAfterMe = product.LookAfterMe,
                 AboutMe = product.AboutMe,
