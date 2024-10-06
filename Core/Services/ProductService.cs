@@ -193,7 +193,8 @@ namespace Core.Services
 
         public async Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize)
         {
-            var query = _context.Products;
+            var query = _context.Products.GroupBy(x => x.Name).Select(g => g.First()); // Групування за назвою
+
 
             // Загальна кількість продуктів
             var totalProducts = await query.CountAsync();
