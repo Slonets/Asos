@@ -181,5 +181,13 @@ namespace AsosWeb.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("ReturnNewProductSize")]
+        public async Task<IActionResult> ReturnNewProductSize([FromQuery] string nameProduct, [FromQuery] int newSize)
+        {
+            var result = await _productService.ReturnNewProductSize(nameProduct, newSize);
+
+            return Ok(result);
+        }
     }
 }
