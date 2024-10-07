@@ -26,6 +26,6 @@ namespace Core.DTO.Site.Product
         public string LookAfterMe { get; set; }
         public string AboutMe { get; set; }
         public int Amount { get; set; }
-        public List<IFormFile> ImageUrls { get; set; }
+        public List<string> ImageUrls { get; set; }
     }
 }

@@ -204,7 +204,8 @@ namespace Core.Services
             var totalProducts = await query.CountAsync();
 
             // Повернення продуктів для конкретної сторінки
-            var products = await query
+            var products = await _context.Products
+                .Include(p=> p.ProductImages)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -216,7 +217,7 @@ namespace Core.Services
                 Items = productDtos,
                 TotalCount = totalProducts,
                 PageSize = pageSize,
-                CurrentPage = pageNumber
+                CurrentPage = pageNumber,
             };
         }
 
