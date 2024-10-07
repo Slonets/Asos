@@ -127,6 +127,25 @@ namespace AsosWeb.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
+        [HttpGet("GetByIdCard/{id}")]
+        public async Task<IActionResult> GetByIdCard(int id)
+        {
+            try
+            {
+                var productDto = await _productService.GetByIdCard(id);
+                return Ok(productDto);
+            }
+            catch (ArgumentException ex)
+            {
+                // Повертаємо статус 404, якщо продукт не знайдено
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Обробляємо інші можливі помилки
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
 
         [HttpGet("GetManClothing")]
         public async Task<IActionResult> GetManClothing()
