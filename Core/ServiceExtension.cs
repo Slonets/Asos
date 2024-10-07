@@ -23,6 +23,7 @@ namespace Core
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IBrandService, BrandServices>();
             service.AddScoped<IBasketService, BasketService>();
+            service.AddScoped<IOrderService, OrderService>();
         }       
         public static void AddAutoMapper(this IServiceCollection service)
         {

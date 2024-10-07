@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DTO.Site.Basket;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,6 @@ namespace Core.DTO.Authentication
         public string? Email { get; set; }
         public string? Password { get; set; }
         public List<int> Baskets { get; set; } = new List<int>();
+        public List<OrderItemDto>? Orders { get; set; }
     }
 }

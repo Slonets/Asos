@@ -146,9 +146,6 @@ namespace Core.Services
             return true; // Видалення успішне
         }
 
-
-
-
         public async Task<CreateProductDto> Get(int id)
         {
             if (id < 0) return null; // exception handling
@@ -171,9 +168,7 @@ namespace Core.Services
             if (product == null)
             {
                 throw new ArgumentException("Product not found");
-            }
-
-         
+            }         
 
             // Перетворюємо дані продукту в DTO (Data Transfer Object)
             var productDto = new GetProductByIdDto
@@ -181,11 +176,11 @@ namespace Core.Services
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                CategoryId = product.CategoryId,
-                BrandId = product.BrandId,
-                Size = product.Size,
+                CategoryName = product.Category.Name,
+                BrandName = product.Brand.Name,
+                Size = product.Size.ToString(),
                 Color = product.Color,
-                Gender = product.Gender,
+                Gender = product.Gender.ToString(),
                 SizeAndFit = product.SizeAndFit,
                 LookAfterMe = product.LookAfterMe,
                 AboutMe = product.AboutMe,
@@ -198,7 +193,8 @@ namespace Core.Services
 
         public async Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize)
         {
-            var query = _context.Products;
+            var query = _context.Products.GroupBy(x => x.Name).Select(g => g.First()); // Групування за назвою
+
 
             // Загальна кількість продуктів
             var totalProducts = await query.CountAsync();
@@ -330,13 +326,16 @@ namespace Core.Services
 
         public async Task<List<ViewManClothingDto>> GetManClothingAsync()
         {
-            var clothing = await _context.Products.Where(x => x.Gender == Gender.Male)
-                                                  .Include(x => x.ProductImages)
-                                                  .Include(x => x.Brand)
-                                                  .Include(x => x.Category)
-                                                  .ToListAsync();             
+            var clothing = await _context.Products
+                                  .Where(x => x.Gender == Gender.Male)
+                                  .Include(x => x.ProductImages)
+                                  .Include(x => x.Brand)
+                                  .Include(x => x.Category)
+                                  .GroupBy(x => x.Name) // Групування за назвою
+                                  .Select(g => g.First()) // Беремо тільки перший товар з однаковою назвою
+                                  .ToListAsync();
 
-            return _mapper.Map<List<ViewManClothingDto>>(clothing);
+            return _mapper.Map<List<ViewManClothingDto>>(clothing);           
         }
         public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
         {
@@ -344,6 +343,8 @@ namespace Core.Services
                                                   .Include(x => x.ProductImages)
                                                   .Include(x => x.Brand)
                                                   .Include(x => x.Category)
+                                                  .GroupBy(x => x.Name) // Групування за назвою
+                                                  .Select(g => g.First()) // Беремо тільки перший товар з однаковою назвою
                                                   .ToListAsync();             
 
             return _mapper.Map<List<ViewManClothingDto>>(clothing);
@@ -405,6 +406,22 @@ namespace Core.Services
             await _context.SaveChangesAsync();
 
             return true; // Видалення успішне
+        }
+
+        public async Task<int> ReturnNewProductSize(string nameProduct, int newSize)
+        {
+
+            // Перетворюємо рядок на enum без перевірки
+            var parsedSize = (Size)newSize;
+
+            // Знаходимо продукт за назвою та розміром
+            var clothing = await _context.Products
+                                        .Where(x => x.Name == nameProduct && x.Size == parsedSize)
+                                        .FirstOrDefaultAsync();
+
+            int result = clothing.Id;
+
+            return result;
         }
     }
 }
