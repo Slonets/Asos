@@ -17,6 +17,7 @@ namespace Core.Interfaces
         Task<List<object>> GettAllSizesAsync();
         Task<List<object>> GettAllGendersAsync();
         Task<GetProductByIdDto> GetById(int id);
+        Task<GetCardById> GetByIdCard(int id);
         Task<List<ViewManClothingDto>> GetManClothingAsync();
         Task<List<ViewManClothingDto>> GetWomanClothingAsync();
         Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array);

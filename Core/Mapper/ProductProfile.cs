@@ -19,7 +19,8 @@ namespace Core.Mapper
             .ForMember(dest => dest.ImagePaths, opt => opt.MapFrom(src => src.ProductImages.Select(pi => pi.ImagePath).ToList()))
             .ForMember(dest=>dest.Brand, opt=>opt.MapFrom(src=>src.Brand.Name))
             .ForMember(dest=>dest.Category, opt=>opt.MapFrom(src=>src.Category.Name));
-          
+          CreateMap<ProductEntity , GetAllProductDto>()
+                .ForMember(dest=>dest.ImageUrls,opt=>opt.MapFrom(src=>src.ProductImages.Select(pi=>pi.ImagePath).ToList()));
         }
     }
 }

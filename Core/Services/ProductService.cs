@@ -190,13 +190,49 @@ namespace Core.Services
             };
             return productDto;
         }
+        public async Task<GetCardById> GetByIdCard(int id)
+        {
+            var product = await _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Include(p => p.ProductImages)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
+            if (product == null)
+            {
+                throw new ArgumentException("Product not found");
+            }
+
+
+
+            // Перетворюємо дані продукту в DTO (Data Transfer Object)
+            var productDto = new GetCardById
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                CategoryId = product.CategoryId,
+                BrandId = product.BrandId,
+                Size = product.Size,
+                Color = product.Color,
+                Gender = product.Gender,
+                SizeAndFit = product.SizeAndFit,
+                LookAfterMe = product.LookAfterMe,
+                AboutMe = product.AboutMe,
+                Amount = product.Amount,
+                Price = product.Price,
+                ImageUrls = product.ProductImages.Select(img => img.ImagePath).ToList()
+            };
+            return productDto;
+        }
         public async Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize)
         {
-            var query = _context.Products.GroupBy(x => x.Name).Select(g => g.First()); // Групування за назвою
+            // Наприклад, вибираємо продукти з певним розміром, або за іншим параметром
+            var query = _context.Products
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First()); // Вибираємо перший продукт за розміром
 
-
-            // Загальна кількість продуктів
+            // Загальна кількість унікальних продуктів
             var totalProducts = await query.CountAsync();
 
             // Повернення продуктів для конкретної сторінки
