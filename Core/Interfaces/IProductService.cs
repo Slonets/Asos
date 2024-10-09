@@ -23,7 +23,7 @@ namespace Core.Interfaces
         Task<List<ViewManClothingDto>> GetArrayFavorite(int[] array);
         Task<bool> DeleteImageAsync(string imagePath);
         Task AddProductImages(int productId, List<IFormFile> images);
-
         Task <int>ReturnNewProductSize(string nameProduct, int newSize);
+        Task<List<GetProductByIdDto>> SearchProducts(string name);
     }
 }

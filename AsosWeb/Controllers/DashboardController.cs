@@ -3,6 +3,7 @@ using Core.DTO.Site.Product;
 using Core.Interfaces;
 using Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsosWeb.Controllers
 {
@@ -207,6 +208,25 @@ namespace AsosWeb.Controllers
             var result = await _productService.ReturnNewProductSize(nameProduct, newSize);
 
             return Ok(result);
+        }
+
+        [HttpGet("SearchProducts")]
+        public async Task<IActionResult> SearchProducts([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("Search query is empty.");
+            }
+
+            var products = await _productService.SearchProducts(name);
+
+            if (products.Count == 0)
+            {
+                return NotFound("No products found.");
+            }
+
+
+            return Ok(products);
         }
     }
 }
