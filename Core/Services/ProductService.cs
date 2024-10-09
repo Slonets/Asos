@@ -458,5 +458,38 @@ namespace Core.Services
 
             return result;
         }
+
+        public async Task<List<GetProductByIdDto>> SearchProducts(string name)
+        {
+            // Пошук продуктів за частковим співпадінням
+            var products = await _context.Products
+                .Where(p => p.Name.Contains(name))
+                .Include(p => p.Brand)  // Завантажуємо зв'язані дані
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .ToListAsync();           
+
+            // Мапимо кожен продукт на GetProductByIdDto
+            var productDtos = products.Select(p => new GetProductByIdDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Size = p.Size.ToString(), // Перетворюємо на рядок (якщо Size — це enum)
+                Color = p.Color,
+                BrandName = p.Brand?.Name, // Якщо є зв'язок із брендом
+                CategoryName = p.Category?.Name, // Якщо є зв'язок із категорією
+                Gender = p.Gender.ToString(), // Перетворюємо на рядок (якщо Gender — це enum)
+                SizeAndFit = p.SizeAndFit,
+                LookAfterMe = p.LookAfterMe,
+                AboutMe = p.AboutMe,
+                Amount = p.Amount,
+                ImageUrls = p.ProductImages.Select(img => img.ImagePath).ToList() // Отримуємо список URL зображень
+            }).ToList();
+
+            return productDtos;
+        }
+
     }
 }
