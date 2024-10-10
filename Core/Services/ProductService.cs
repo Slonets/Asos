@@ -230,6 +230,146 @@ namespace Core.Services
             // Вибираємо продукти з фотографіями
             var query = _context.Products
                 .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 1 || p.Category.Id == 2)
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<GetAllProductDto>> GetAllProductsForAdmin(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<GetAllProductDto>> GetAllMakeUp(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 4)
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<GetAllProductDto>> GetAllSkinCare(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 5)
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<GetAllProductDto>> GetAllHairCare(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 6)
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<GetAllProductDto>> GetAllPerfume(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 7)
                 .GroupBy(x => x.Name)
                 .Select(g => g.OrderBy(p => p.Size).First());
 
@@ -408,6 +548,7 @@ namespace Core.Services
             // Вибираємо чоловічий одяг з фотографіями та іншими пов'язаними даними
             var query = _context.Products
                 .Where(x => x.Gender == Gender.Female) // Фільтр по статі
+                .Where(c=>c.Category.Name== "Clothing" || c.Category.Name == "Sportswear")
                 .Include(x => x.ProductImages) // Додаємо фотографії продуктів
                 .Include(x => x.Brand) // Додаємо бренд
                 .Include(x => x.Category) // Додаємо категорію

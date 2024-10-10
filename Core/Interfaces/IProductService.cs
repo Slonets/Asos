@@ -12,8 +12,13 @@ namespace Core.Interfaces
         Task<CreateProductDto> Get(int id);
         Task Update(UpdateProductDto model);
         Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize);
+        Task<PagedResult<GetAllProductDto>> GetAllProductsForAdmin(int pageNumber, int pageSize);
         Task<PagedResult<ViewAllManClothingDto>> GetAllManClothingAsync(int pageNumber, int pageSize);
         Task<PagedResult<ViewAllWomanClothingDto>> GetAllWomanClothingAsync(int pageNumber, int pageSize);
+        Task<PagedResult<GetAllProductDto>> GetAllMakeUp(int pageNumber, int pageSize);
+        Task<PagedResult<GetAllProductDto>> GetAllSkinCare(int pageNumber, int pageSize);
+        Task<PagedResult<GetAllProductDto>> GetAllHairCare(int pageNumber, int pageSize);
+        Task<PagedResult<GetAllProductDto>> GetAllPerfume(int pageNumber, int pageSize);
         List<object> GettAllSizes();
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();
