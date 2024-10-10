@@ -69,6 +69,16 @@ namespace AsosWeb.Controllers
             var result = await _productService.GetAllProducts(pageNumber, pageSize);
             return Ok(result);
         }
+        [HttpGet("GetAllManClothing")]
+        public async Task<IActionResult> GetAllManClothingAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            return Ok(await _productService.GetAllManClothingAsync(pageNumber, pageSize));
+        }
+        [HttpGet("GetAllWomanClothing")]
+        public async Task<IActionResult> GetAllWomanClothingAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            return Ok(await _productService.GetAllWomanClothingAsync(pageNumber, pageSize));
+        }
 
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
@@ -153,6 +163,7 @@ namespace AsosWeb.Controllers
         {
             return Ok(await _productService.GetManClothingAsync());
         }
+       
 
         [HttpGet("GetWomanClothing")]
         public async Task<IActionResult> GetWomanClothing()
