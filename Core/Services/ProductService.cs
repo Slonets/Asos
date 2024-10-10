@@ -227,10 +227,11 @@ namespace Core.Services
         }
         public async Task<PagedResult<GetAllProductDto>> GetAllProducts(int pageNumber, int pageSize)
         {
-            // Наприклад, вибираємо продукти з певним розміром, або за іншим параметром
+            // Вибираємо продукти з фотографіями
             var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
                 .GroupBy(x => x.Name)
-                .Select(g => g.OrderBy(p => p.Size).First()); // Вибираємо перший продукт за розміром
+                .Select(g => g.OrderBy(p => p.Size).First());
 
             // Загальна кількість унікальних продуктів
             var totalProducts = await query.CountAsync();
@@ -371,6 +372,66 @@ namespace Core.Services
                                   .ToListAsync();
 
             return _mapper.Map<List<ViewManClothingDto>>(clothing);           
+        }
+        public async Task<PagedResult<ViewAllManClothingDto>> GetAllManClothingAsync(int pageNumber, int pageSize)
+        {
+            // Вибираємо чоловічий одяг з фотографіями та іншими пов'язаними даними
+            var query = _context.Products
+                .Where(x => x.Gender == Gender.Male) // Фільтр по статі
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Include(x => x.Brand) // Додаємо бренд
+                .Include(x => x.Category) // Додаємо категорію
+                .GroupBy(x => x.Name) // Групуємо продукти за назвою
+                .Select(g => g.First()); // Беремо тільки перший продукт з однаковою назвою
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var clothing = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var clothingDtos = _mapper.Map<List<ViewAllManClothingDto>>(clothing);
+
+            return new PagedResult<ViewAllManClothingDto>
+            {
+                Items = clothingDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
+        public async Task<PagedResult<ViewAllWomanClothingDto>> GetAllWomanClothingAsync(int pageNumber, int pageSize)
+        {
+            // Вибираємо чоловічий одяг з фотографіями та іншими пов'язаними даними
+            var query = _context.Products
+                .Where(x => x.Gender == Gender.Female) // Фільтр по статі
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Include(x => x.Brand) // Додаємо бренд
+                .Include(x => x.Category) // Додаємо категорію
+                .GroupBy(x => x.Name) // Групуємо продукти за назвою
+                .Select(g => g.First()); // Беремо тільки перший продукт з однаковою назвою
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var clothing = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var clothingDtos = _mapper.Map<List<ViewAllWomanClothingDto>>(clothing);
+
+            return new PagedResult<ViewAllWomanClothingDto>
+            {
+                Items = clothingDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
         public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
         {
