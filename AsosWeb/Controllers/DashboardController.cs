@@ -69,6 +69,36 @@ namespace AsosWeb.Controllers
             var result = await _productService.GetAllProducts(pageNumber, pageSize);
             return Ok(result);
         }
+        [HttpGet("GetAllProductsForAdmin")]
+        public async Task<IActionResult> GetAllProductsForAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllProductsForAdmin(pageNumber, pageSize);
+            return Ok(result);
+        }
+        [HttpGet("GetAllMakeUpProducts")]
+        public async Task<IActionResult> GetAllMakeUp([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllMakeUp(pageNumber, pageSize);
+            return Ok(result);
+        }
+        [HttpGet("GetAllSkinCareProducts")]
+        public async Task<IActionResult> GetAllSkinCare([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllSkinCare(pageNumber, pageSize);
+            return Ok(result);
+        }
+        [HttpGet("GetAllHairCareProducts")]
+        public async Task<IActionResult> GetAllHairCare([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllHairCare(pageNumber, pageSize);
+            return Ok(result);
+        }
+        [HttpGet("GetAllPerfumeProducts")]
+        public async Task<IActionResult> GetAllPerfume([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllPerfume(pageNumber, pageSize);
+            return Ok(result);
+        }
         [HttpGet("GetAllManClothing")]
         public async Task<IActionResult> GetAllManClothingAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
