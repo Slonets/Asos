@@ -528,6 +528,8 @@ namespace Core.Services
                 .Include(p => p.Brand)  // Завантажуємо зв'язані дані
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
+                .GroupBy(x => x.Name) // Групування за назвою
+                .Select(g => g.First())
                 .ToListAsync();           
 
             // Мапимо кожен продукт на GetProductByIdDto
