@@ -577,6 +577,7 @@ namespace Core.Services
         public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
         {
             var clothing = await _context.Products.Where(x => x.Gender == Gender.Female)
+                                                  .Where(c => c.Category.Name == "Clothing" || c.Category.Name == "Sportswear")
                                                   .Include(x => x.ProductImages)
                                                   .Include(x => x.Brand)
                                                   .Include(x => x.Category)
@@ -693,6 +694,82 @@ namespace Core.Services
             }).ToList();
 
             return productDtos;
+        }
+
+        public async Task<List<GetProductByIdDto>> GetAllPerfumeWithoutPagination()
+        {
+            var parfume = await _context.Products
+        .Where(p => p.Category.Name == "Perfume")
+        .Select(p => new GetProductByIdDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            Size = p.Size.ToString(),  // Якщо Size - це об'єкт, перетворюємо в строку
+            Color = p.Color,
+            BrandName = p.Brand.Name,
+            CategoryName = p.Category.Name,
+            Gender = p.Gender.ToString(),
+            SizeAndFit = p.SizeAndFit,
+            LookAfterMe = p.LookAfterMe,
+            AboutMe = p.AboutMe,
+            Amount = p.Amount,
+            ImageUrls = p.ProductImages.Select(i => i.ImagePath).ToList() // Перетворення зображень в список URL
+        }).ToListAsync();
+
+            return parfume;
+        }
+
+        public async Task<List<GetProductByIdDto>> GetAllMakeUpWithoutPagination()
+        {
+
+            var makeUp= await _context.Products
+           .Where(p => p.Category.Name == "Make Up")
+           .Select(p => new GetProductByIdDto
+           {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            Size = p.Size.ToString(),  // Якщо Size - це об'єкт, перетворюємо в строку
+            Color = p.Color,
+            BrandName = p.Brand.Name,
+            CategoryName = p.Category.Name,
+            Gender = p.Gender.ToString(),
+            SizeAndFit = p.SizeAndFit,
+            LookAfterMe = p.LookAfterMe,
+            AboutMe = p.AboutMe,
+            Amount = p.Amount,
+            ImageUrls = p.ProductImages.Select(i => i.ImagePath).ToList() // Перетворення зображень в список URL
+            }).ToListAsync();
+
+            return makeUp;
+        }
+
+        public async Task<List<GetProductByIdDto>> GetAllSkinCareWithoutPagination()
+        {
+            var skinCareProducts = await _context.Products
+         .Where(p => p.Category.Name == "Skin Care")
+         .Select(p => new GetProductByIdDto
+         {
+             Id = p.Id,
+             Name = p.Name,
+             Description = p.Description,
+             Price = p.Price,
+             Size = p.Size.ToString(),  // Якщо Size - це об'єкт, перетворюємо його в строку
+             Color = p.Color,
+             BrandName = p.Brand.Name,
+             CategoryName = p.Category.Name,
+             Gender = p.Gender.ToString(),
+             SizeAndFit = p.SizeAndFit,
+             LookAfterMe = p.LookAfterMe,
+             AboutMe = p.AboutMe,
+             Amount = p.Amount,
+             ImageUrls = p.ProductImages.Select(i => i.ImagePath).ToList() // Перетворення зображень в список URL
+         }).ToListAsync();
+
+            return skinCareProducts;
         }
 
     }
