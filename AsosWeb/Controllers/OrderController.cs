@@ -1,5 +1,6 @@
 ﻿using Core.DTO.Site.Basket;
 using Core.Interfaces;
+using Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,38 @@ namespace AsosWeb.Controllers
             var orders = await _orderService.GetOrderById(id, pageNumber, pageSize);
 
             return Ok(orders);
+        }
+
+        [HttpGet("GetAllOrders")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var orders = await _orderService.GetAllOrders();
+
+            return Ok(orders);
+        }
+
+        [HttpGet("ResiveOrderById/{id}")]
+        public async Task<IActionResult> ResiveOrderById(int id)
+        {
+
+            var orders = await _orderService.ResiveOrderById(id);
+
+            return Ok(orders);
+        }
+
+        [HttpGet("GetAllStatus")]
+        public async Task<IActionResult> GetAllStatus()
+        {
+            return Ok(await _orderService.GetAllStatus());
+        }
+
+        [HttpPost("ChangeStatus")]
+        public async Task<IActionResult> ChangeStatus(int newStatus, int id)
+        {
+
+            await _orderService.ChangeStatus(newStatus, id);
+
+            return Ok();
         }
     }
 }

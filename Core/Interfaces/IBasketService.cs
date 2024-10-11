@@ -19,5 +19,7 @@ namespace Core.Interfaces
         Task<List<int>> DeleteProductWithBascet(int userId, int productId);
         Task PushOrderWhenLogin(int userId, List<OrderItemDto> orderItems);
 
+        
+
     }
 }
