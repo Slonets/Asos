@@ -148,18 +148,39 @@ app.UseStaticFiles();
 
 app.SeedData();
 
-//var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+app.UseStaticFiles();
 
-//if (!Directory.Exists(dir))
-//{
-//    Directory.CreateDirectory(dir);
-//}
+var productImgsDir = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs");
+var avatarsDir = Path.Combine(Directory.GetCurrentDirectory(), "images", "avatars");
 
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(dir),
-//    RequestPath = "/wwwroot"
-//});
+// Перевірка та створення папки для продуктів, якщо вона не існує
+if (!Directory.Exists(productImgsDir))
+{
+    Directory.CreateDirectory(productImgsDir);
+}
+
+// Перевірка та створення папки для аватарів, якщо вона не існує
+if (!Directory.Exists(avatarsDir))
+{
+    Directory.CreateDirectory(avatarsDir);
+}
+
+// Додаємо статичні файли для папки productImgs
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(productImgsDir),
+    RequestPath = "/images/productImgs"
+});
+
+// Додаємо статичні файли для папки avatars
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(avatarsDir),
+    RequestPath = "/images/avatars"
+});
+
+app.UseRouting();
+
 
 app.UseStaticFiles();
 

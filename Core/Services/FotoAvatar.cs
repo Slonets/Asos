@@ -73,17 +73,14 @@ namespace Core.Services
         {
             try
             {
-                // Отримуємо шлях до wwwroot
-                string root = _environment.WebRootPath;
+                // Шлях до папки "images/avatars" у кореневій директорії
+                string root = Directory.GetCurrentDirectory();
+                string imageFolder = Path.Combine(root, "images", "avatars");
 
-                // Вказуємо папку для зберігання зображень
-                string imageFolder = "avatars";
-                string folderPath = Path.Combine(root, imageFolder);
-
-                // Перевіряємо, чи існує папка, якщо ні - створюємо
-                if (!Directory.Exists(folderPath))
+                // Перевіряємо, чи існує папка, якщо ні — створюємо
+                if (!Directory.Exists(imageFolder))
                 {
-                    Directory.CreateDirectory(folderPath);
+                    Directory.CreateDirectory(imageFolder);
                 }
 
                 // Генеруємо нову назву для файлу
@@ -91,24 +88,28 @@ namespace Core.Services
                 string fileName = $"{newNameFile}.webp";
 
                 // Повний шлях до файлу
-                string imageFullPath = Path.Combine(folderPath, fileName);
+                string imageFullPath = Path.Combine(imageFolder, fileName);
+
+                // Перевіряємо, чи файл не null і обробляємо його
+                if (file != null)
                 {
                     using (var image = Image.Load(file.OpenReadStream()))
                     {
-                        //image.Mutate(x => x.Resize(new ResizeOptions
-                        //{
-                        //    Size = new Size(size, size),
-                        //    Mode = ResizeMode.Max
-                        //}));
+                        // Можна додати маніпуляції з зображенням, якщо це необхідно
                         await image.SaveAsync(imageFullPath, new WebpEncoder());
                     }
+
+                    return fileName; // Повертаємо назву файлу
                 }
-                return fileName;
+                else
+                {
+                    throw new ArgumentNullException(nameof(file), "Файл не був переданий.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Помилка при збереженні файлу {ex.Message}");
-                return ex.Message;
+                Console.WriteLine($"Помилка при збереженні файлу: {ex.Message}");
+                return $"Error: {ex.Message}";
             }
         }
 
@@ -116,13 +117,14 @@ namespace Core.Services
         {
             try
             {
-                // Визначаємо кореневий шлях
-                string root = _environment.WebRootPath;
+                // Шлях до папки "images/avatars" у кореневій директорії
+                string root = Directory.GetCurrentDirectory();
+                string imageFolder = Path.Combine(root, "images", "avatars");
 
-                // Якщо існує старий файл, видаляємо його
+                // Перевіряємо, чи існує старий файл, якщо так — видаляємо його
                 if (!string.IsNullOrEmpty(existingFileName))
                 {
-                    string existingFilePath = Path.Combine(root, imageFolder, existingFileName);
+                    string existingFilePath = Path.Combine(imageFolder, existingFileName);
                     if (System.IO.File.Exists(existingFilePath))
                     {
                         System.IO.File.Delete(existingFilePath);
@@ -132,22 +134,29 @@ namespace Core.Services
                 // Генеруємо нове ім'я файлу
                 string newNameFile = Guid.NewGuid().ToString();
                 string fileName = $"{newNameFile}.webp";
-                string imagePath = Path.Combine(imageFolder, fileName);
-                string imageFullPath = Path.Combine(root, imagePath);
+                string imageFullPath = Path.Combine(imageFolder, fileName);
 
-                // Зберігаємо нове зображення
-                using (var image = Image.Load(file.OpenReadStream()))
+                // Перевіряємо, чи файл не null і обробляємо його
+                if (file != null)
                 {
-                    await image.SaveAsync(imageFullPath, new WebpEncoder());
-                }
+                    using (var image = Image.Load(file.OpenReadStream()))
+                    {
+                        await image.SaveAsync(imageFullPath, new WebpEncoder());
+                    }
 
-                return fileName;
+                    return fileName; // Повертаємо назву нового файлу
+                }
+                else
+                {
+                    throw new ArgumentNullException(nameof(file), "Файл не був переданий.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Помилка при збереженні файлу {ex.Message}");
-                return ex.Message;
+                Console.WriteLine($"Помилка при збереженні файлу: {ex.Message}");
+                return $"Error: {ex.Message}";
             }
         }
+
     }
 }

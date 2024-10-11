@@ -38,7 +38,7 @@ namespace Core.Services
         }
         public async Task Create(CreateProductDto model)
         {
-           var product = _mapper.Map<ProductEntity>(model);
+            var product = _mapper.Map<ProductEntity>(model);
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
@@ -46,41 +46,34 @@ namespace Core.Services
             if (model.ImageUrls != null && model.ImageUrls.Any())
             {
                 var imgList = new List<ProductImageEntity>();
-                string webRootPath = _webHostEnvironment.WebRootPath;
-                if (string.IsNullOrEmpty(webRootPath))
-                {
-                    throw new InvalidOperationException("Web root path is not set.");
-                }
-                string upload = Path.Combine(webRootPath, "product");
 
-                if (!Directory.Exists(upload))
-                {
-                    Directory.CreateDirectory(upload);
-                }
+                // Шлях до папки "images/productImgs"
+                string imageFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs");
 
                 foreach (var imgFile in model.ImageUrls)
                 {
                     string fileName = Guid.NewGuid().ToString();
-                    string extensions = Path.GetExtension(imgFile.FileName);
+                    string extension = Path.GetExtension(imgFile.FileName);
 
-                    using (var filestream = new FileStream(Path.Combine(upload, fileName + extensions), FileMode.Create))
+                    // Збереження файлу
+                    using (var filestream = new FileStream(Path.Combine(imageFolderPath, fileName + extension), FileMode.Create))
                     {
                         imgFile.CopyTo(filestream);
                     }
 
+                    // Додаємо відносний шлях до зображення
                     var img = new ProductImageEntity
                     {
-                        ImagePath = fileName + extensions,
+                        ImagePath = Path.Combine("/images/productImgs", fileName + extension), // Відносний шлях для доступу через API
                         ProductId = product.Id,
-                        
                     };
 
                     imgList.Add(img);
                 }
+
                 product.ProductImages = imgList;
                 _context.ProductImages.AddRange(imgList);
                 await _context.SaveChangesAsync();
-
             }
         }
 
