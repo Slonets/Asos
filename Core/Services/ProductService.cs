@@ -253,6 +253,34 @@ namespace Core.Services
                 CurrentPage = pageNumber
             };
         }
+        public async Task<PagedResult<GetAllProductDto>> GetAllProductsForBody(int pageNumber, int pageSize)
+        {
+            // Вибираємо продукти з фотографіями
+            var query = _context.Products
+                .Include(x => x.ProductImages) // Додаємо фотографії продуктів
+                .Where(p => p.Category.Id == 4 || p.Category.Id == 5 || p.Category.Id == 6 || p.Category.Id == 7)
+                .GroupBy(x => x.Name)
+                .Select(g => g.OrderBy(p => p.Size).First());
+
+            // Загальна кількість унікальних продуктів
+            var totalProducts = await query.CountAsync();
+
+            // Повернення продуктів для конкретної сторінки
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<GetAllProductDto>>(products);
+
+            return new PagedResult<GetAllProductDto>
+            {
+                Items = productDtos,
+                TotalCount = totalProducts,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+        }
         public async Task<PagedResult<GetAllProductDto>> GetAllProductsForAdmin(int pageNumber, int pageSize)
         {
             // Вибираємо продукти з фотографіями
