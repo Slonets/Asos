@@ -20,12 +20,9 @@ namespace Core.Services
         {
             try
             {
-                // Отримуємо шлях до wwwroot
-                string root = _environment.WebRootPath;
-
                 // Вказуємо папку для зберігання зображень
-                string imageFolder = "product";
-                string folderPath = Path.Combine(root, imageFolder);
+                string imageFolder = Path.Combine("images", "productImgs"); // Задайте тут вашу папку
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), imageFolder);
 
                 // Перевіряємо, чи існує папка, якщо ні - створюємо
                 if (!Directory.Exists(folderPath))
@@ -42,15 +39,15 @@ namespace Core.Services
 
                 using (var client = new HttpClient())
                 {
-                    var response = client.GetAsync(url).Result;
+                    var response = await client.GetAsync(url); // Використовуйте await
                     if (response.IsSuccessStatusCode)
                     {
-                        using (var stream = response.Content.ReadAsStreamAsync().Result)
+                        using (var stream = await response.Content.ReadAsStreamAsync()) // Використовуйте await
                         {
                             using (var image = Image.Load(stream))
                             {
                                 // Збереження зображення у форматі WebP
-                                image.Save(imageFullPath, new WebpEncoder());
+                                await image.SaveAsync(imageFullPath, new WebpEncoder()); // Використовуйте await
                             }
                         }
                         return fileName;
@@ -68,6 +65,7 @@ namespace Core.Services
                 return ex.Message;
             }
         }
+
 
         public async Task<string> SaveFotoAvatar(IFormFile? file)
         {

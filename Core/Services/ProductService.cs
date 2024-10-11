@@ -64,7 +64,7 @@ namespace Core.Services
                     // Додаємо відносний шлях до зображення
                     var img = new ProductImageEntity
                     {
-                        ImagePath = Path.Combine("/images/productImgs", fileName + extension), // Відносний шлях для доступу через API
+                        ImagePath = fileName + extension, // Відносний шлях для доступу через API
                         ProductId = product.Id,
                     };
 
@@ -80,7 +80,7 @@ namespace Core.Services
         public async Task AddProductImages(int productId, List<IFormFile> images)
         {
             var product = await _context.Products.Include(p => p.ProductImages)
-                                                 .FirstOrDefaultAsync(p => p.Id == productId);
+                                                  .FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
                 throw new KeyNotFoundException("Product not found");
@@ -88,15 +88,10 @@ namespace Core.Services
             if (images != null && images.Any())
             {
                 var imgList = new List<ProductImageEntity>();
-                string webRootPath = _webHostEnvironment.WebRootPath;
+                string root = Directory.GetCurrentDirectory(); // Шлях до кореневої папки
+                string upload = Path.Combine(root, "images", "productImgs"); // Папка для зображень
 
-                if (string.IsNullOrEmpty(webRootPath))
-                {
-                    throw new InvalidOperationException("Web root path is not set.");
-                }
-
-                string upload = Path.Combine(webRootPath, "product");
-
+                // Перевіряємо, чи існує папка, якщо ні - створюємо
                 if (!Directory.Exists(upload))
                 {
                     Directory.CreateDirectory(upload);
@@ -105,26 +100,30 @@ namespace Core.Services
                 foreach (var imgFile in images)
                 {
                     string fileName = Guid.NewGuid().ToString();
-                    string extensions = Path.GetExtension(imgFile.FileName);
+                    string extension = Path.GetExtension(imgFile.FileName);
 
-                    using (var fileStream = new FileStream(Path.Combine(upload, fileName + extensions), FileMode.Create))
+                    // Зберігаємо зображення
+                    using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
                     {
                         await imgFile.CopyToAsync(fileStream);
                     }
 
+                    // Створюємо новий запис для бази даних
                     var img = new ProductImageEntity
                     {
-                        ImagePath = fileName + extensions,
+                        ImagePath = fileName + extension,
                         ProductId = productId
                     };
 
                     imgList.Add(img);
                 }
 
+                // Додаємо зображення до бази даних
                 _context.ProductImages.AddRange(imgList);
                 await _context.SaveChangesAsync();
             }
         }
+
 
         public async Task<bool> Delete(int id)
         {
@@ -457,10 +456,13 @@ namespace Core.Services
                     var imageEntity = product.ProductImages.FirstOrDefault(img => img.ImagePath == imagePath);
                     if (imageEntity != null)
                     {
+                        // Визначаємо повний шлях до файлу
+                        string fullImagePath = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs", imagePath);
+
                         // Видалити файл
-                        if (File.Exists(imagePath))
+                        if (File.Exists(fullImagePath))
                         {
-                            File.Delete(imagePath);
+                            File.Delete(fullImagePath);
                         }
 
                         // Видалити запис з бази
@@ -474,24 +476,27 @@ namespace Core.Services
             {
                 foreach (var file in model.ImageUrls)
                 {
-                    var filePath = Path.Combine("wwwroot", "img", file.FileName);
+                    var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Генеруємо нове ім'я файлу
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs", newFileName); // Визначаємо шлях для нового зображення
+
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await file.CopyToAsync(stream);
+                        await file.CopyToAsync(stream); // Зберігаємо нове зображення
                     }
 
                     var productImage = new ProductImageEntity
                     {
-                        ImagePath = filePath,
+                        ImagePath = newFileName, // Зберігаємо нове ім'я файлу
                         ProductId = product.Id,
                     };
 
-                    product.ProductImages.Add(productImage); 
+                    product.ProductImages.Add(productImage);
                 }
             }
 
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<List<ViewManClothingDto>> GetManClothingAsync()
         {
@@ -624,7 +629,7 @@ namespace Core.Services
             }
 
             // Логіка видалення файлу з файлової системи
-            var filePath = Path.Combine("wwwroot/images/products", imageEntity.ImagePath); // Вкажіть правильний шлях до вашого зображення
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs", imageEntity.ImagePath); // Правильний шлях до вашого зображення
 
             if (File.Exists(filePath))
             {
@@ -637,6 +642,7 @@ namespace Core.Services
 
             return true; // Видалення успішне
         }
+
 
         public async Task<int> ReturnNewProductSize(string nameProduct, int newSize)
         {

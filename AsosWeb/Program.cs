@@ -142,13 +142,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapControllers();
-
-app.UseStaticFiles();
-
 app.SeedData();
 
-app.UseStaticFiles();
 
 var productImgsDir = Path.Combine(Directory.GetCurrentDirectory(), "images", "productImgs");
 var avatarsDir = Path.Combine(Directory.GetCurrentDirectory(), "images", "avatars");
@@ -166,6 +161,8 @@ if (!Directory.Exists(avatarsDir))
 }
 
 // Додаємо статичні файли для папки productImgs
+
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(productImgsDir),
@@ -180,8 +177,8 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+app.MapControllers();
 
 
-app.UseStaticFiles();
 
 app.Run();
