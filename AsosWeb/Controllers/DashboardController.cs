@@ -69,6 +69,12 @@ namespace AsosWeb.Controllers
             var result = await _productService.GetAllProducts(pageNumber, pageSize);
             return Ok(result);
         }
+        [HttpGet("GetAllProductsForBody")]
+        public async Task<IActionResult> GetAllProductsForBody([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllProductsForBody(pageNumber, pageSize);
+            return Ok(result);
+        }
         [HttpGet("GetAllProductsForAdmin")]
         public async Task<IActionResult> GetAllProductsForAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
