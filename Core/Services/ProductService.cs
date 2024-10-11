@@ -577,6 +577,7 @@ namespace Core.Services
         public async Task<List<ViewManClothingDto>> GetWomanClothingAsync()
         {
             var clothing = await _context.Products.Where(x => x.Gender == Gender.Female)
+                                                  .Where(c => c.Category.Name == "Clothing" || c.Category.Name == "Sportswear")
                                                   .Include(x => x.ProductImages)
                                                   .Include(x => x.Brand)
                                                   .Include(x => x.Category)
