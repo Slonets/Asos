@@ -194,7 +194,6 @@ namespace AsosWeb.Controllers
             return Ok(await _productService.GetManClothingAsync());
         }
        
-
         [HttpGet("GetWomanClothing")]
         public async Task<IActionResult> GetWomanClothing()
         {
@@ -268,6 +267,28 @@ namespace AsosWeb.Controllers
 
 
             return Ok(products);
+        }
+
+
+        [HttpGet("GetAllPerfumeWithoutPagination")]
+        public async Task<IActionResult> GetAllPerfumeWithoutPagination()
+        {
+            var result = await _productService.GetAllPerfumeWithoutPagination();
+            return Ok(result);
+        }  
+        
+        [HttpGet("GetAllMakeUpWithoutPagination")]
+        public async Task<IActionResult> GetAllMakeUpWithoutPagination()
+        {
+            var result = await _productService.GetAllMakeUpWithoutPagination();
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllSkinCareWithoutPagination")]
+        public async Task<IActionResult> GetAllSkinCareWithoutPagination()
+        {
+            var result = await _productService.GetAllSkinCareWithoutPagination();
+            return Ok(result);
         }
     }
 }

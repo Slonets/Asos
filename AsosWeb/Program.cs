@@ -161,6 +161,6 @@ app.SeedData();
 //    RequestPath = "/wwwroot"
 //});
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
 
 app.Run();
