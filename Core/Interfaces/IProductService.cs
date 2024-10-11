@@ -19,6 +19,9 @@ namespace Core.Interfaces
         Task<PagedResult<GetAllProductDto>> GetAllSkinCare(int pageNumber, int pageSize);
         Task<PagedResult<GetAllProductDto>> GetAllHairCare(int pageNumber, int pageSize);
         Task<PagedResult<GetAllProductDto>> GetAllPerfume(int pageNumber, int pageSize);
+        Task<List<GetProductByIdDto>> GetAllPerfumeWithoutPagination();
+        Task<List<GetProductByIdDto>> GetAllMakeUpWithoutPagination();
+        Task<List<GetProductByIdDto>> GetAllSkinCareWithoutPagination();
         List<object> GettAllSizes();
         List<object> GettAllGenders();
         Task<List<object>> GettAllSizesAsync();
