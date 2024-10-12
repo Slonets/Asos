@@ -23,6 +23,6 @@ namespace Core.Interfaces
         Task <ChangeOrderStatus> ResiveOrderById(int id);
 
         Task<List<OrderStatusEntity>> GetAllStatus();
-        Task ChangeStatus(int newStatus, int id);
+        Task ChangeStatus(int NewStatus, int Id);
     }
 }

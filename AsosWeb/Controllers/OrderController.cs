@@ -4,9 +4,17 @@ using Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace AsosWeb.Controllers
 {
+
+    public class ChangeStatusRequest
+    {
+        public int NewStatus { get; set; }
+        public int Id { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
@@ -65,10 +73,10 @@ namespace AsosWeb.Controllers
         }
 
         [HttpPost("ChangeStatus")]
-        public async Task<IActionResult> ChangeStatus(int newStatus, int id)
+        public async Task<IActionResult> ChangeStatus([FromBody] ChangeStatusRequest request)
         {
 
-            await _orderService.ChangeStatus(newStatus, id);
+            await _orderService.ChangeStatus(request.NewStatus, request.Id);
 
             return Ok();
         }

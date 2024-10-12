@@ -168,13 +168,14 @@ namespace Core.Services
             return status;
         }
 
-        public async Task ChangeStatus(int newStatus, int id)
-        {
-            var order = await _context.Orders.Where(x=>x.Id==id).FirstOrDefaultAsync();
 
-            if(order == null)
+        public async Task ChangeStatus(int NewStatus, int Id)
+        {
+            var order = await _context.Orders.Where(x=>x.Id==Id).FirstOrDefaultAsync();
+
+            if(order != null)
             {
-                order.OrderStatus.Id = newStatus;
+                order.OrderStatusId = NewStatus;
 
                 await _context.SaveChangesAsync();
             }
