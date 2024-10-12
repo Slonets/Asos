@@ -27,5 +27,7 @@ namespace Core.Services
             var result = await _context.Brands.ToListAsync();
             return _mapper.Map<List<BrandDto>>(result);
         }
+
+
     }
 }
