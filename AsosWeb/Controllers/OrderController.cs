@@ -11,7 +11,7 @@ namespace AsosWeb.Controllers
 
     public class ChangeStatusRequest
     {
-        public int NewStatus { get; set; }
+        public string NewStatus { get; set; }
         public int Id { get; set; }
     }
 
